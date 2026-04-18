@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Data Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="topbar">
+        <div class="brand">
+          <span class="brand-mark">EE</span>
+          <div>
+            <p class="eyebrow">Global Travel Data</p>
+            <h1>EECONNECT Portal</h1>
+          </div>
+        </div>
+        <div class="topbar-note">Zone-based roaming plans for multi-country trips</div>
+      </nav>
+
+      <section class="hero-grid">
+        <div class="hero-copy">
+          <p class="hero-kicker">Outbound Package Builder</p>
+          <div class="hero-title-row">
+            <h2>Match the right travel plan for every country on your trip</h2>
+            <button class="text-link" id="openHowItWorksBtn" type="button">How it works</button>
+          </div>
+          <p class="hero-text">
+            Search multiple destinations in one flow. The portal will decide whether
+            Zone A, Zone B, or Global is required, then surface the lowest-priced
+            eligible recommendation first.
+          </p>
+
+        </div>
+      </section>
+    </header>
+
+    <main class="portal-layout">
+      <section class="selector-panel card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Step 1</p>
+            <h3>Select destinations</h3>
+          </div>
+          <button class="ghost-btn" id="clearSelectionBtn" type="button">Clear</button>
+        </div>
+
+        <label class="searchbox" for="countrySearch">
+          <span class="search-icon">Search</span>
+          <input
+            id="countrySearch"
+            type="text"
+            autocomplete="off"
+            placeholder="Search countries, for example Japan, France, UAE"
+          >
+        </label>
+
+        <div class="selected-tags" id="selectedTags"></div>
+
+        <div class="quick-picks">
+          <button class="chip" type="button" data-country="Japan">Japan</button>
+          <button class="chip" type="button" data-country="Singapore">Singapore</button>
+          <button class="chip" type="button" data-country="United States">United States</button>
+          <button class="chip" type="button" data-country="France">France</button>
+          <button class="chip" type="button" data-country="UAE">UAE</button>
+          <button class="chip" type="button" data-country="Brazil">Brazil</button>
+        </div>
+
+        <div class="search-results is-hidden" id="searchResults"></div>
+
+        <div class="selection-groups" id="selectionGroups"></div>
+
+        <div class="match-zone-block">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="section-label">Matched zone</p>
+              <h3>Best-fit coverage</h3>
+            </div>
+            <button class="text-link" id="openPackageLogicBtn" type="button">Package logic</button>
+          </div>
+
+          <div class="zone-rail zone-rail-inline" id="zoneRail">
+            <div class="zone-rail-line"></div>
+            <article class="zone-stop" data-zone-stop="Zone A">
+              <span class="zone-stop-dot"></span>
+              <strong>Zone A</strong>
+              <small>Top destinations - 70 countries</small>
+            </article>
+            <article class="zone-stop" data-zone-stop="Zone B">
+              <span class="zone-stop-dot"></span>
+              <strong>Zone B</strong>
+              <small>Extended coverage - 105 countries</small>
+            </article>
+            <article class="zone-stop" data-zone-stop="Global">
+              <span class="zone-stop-dot"></span>
+              <strong>Zone C / Global</strong>
+              <small>Worldwide reach - up to 200 countries</small>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="plan-panel">
+        <div class="card recommendation-card">
+          <div class="section-heading">
+            <div>
+              <p class="section-label">Step 2</p>
+              <h3>Recommended plans</h3>
+            </div>
+            <div class="mode-toggle" id="modeToggle">
+              <button class="mode-btn is-active is-recommended" type="button" data-mode="continuous">
+                Subscription
+                <span class="mode-recommend-tag">Recommended</span>
+              </button>
+              <button class="mode-btn" type="button" data-mode="oneTime">One-time</button>
+            </div>
+          </div>
+
+          <div class="match-summary" id="matchSummary"></div>
+
+          <div class="recommended-slot" id="recommendedSlot"></div>
+
+          <div class="more-plans" id="morePlansWrap">
+            <button class="show-more-btn" id="showMoreBtn" type="button" hidden>Show more options</button>
+            <div class="plan-list is-collapsed" id="morePlansList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="coverage-modal" id="howItWorksModal">
+    <div class="coverage-modal-card">
+      <div class="coverage-modal-head">
+        <div>
+          <p class="section-label">How it works</p>
+          <h3>How plan matching works</h3>
+        </div>
+        <button class="ghost-btn" id="closeHowItWorksModalBtn" type="button">Close</button>
+      </div>
+      <div class="modal-list">
+        <p>1. Search or click countries and build a multi-stop trip.</p>
+        <p>2. The portal matches the lowest zone that covers every selected destination.</p>
+        <p>3. Subscription is shown first, while broader options stay hidden until the user asks to see more.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="coverage-modal" id="coverageModal">
+    <div class="coverage-modal-card">
+      <div class="coverage-modal-head">
+        <div>
+          <p class="section-label">Coverage</p>
+          <h3 id="coverageModalTitle">Zone coverage</h3>
+        </div>
+        <button class="ghost-btn" id="closeCoverageModalBtn" type="button">Close</button>
+      </div>
+      <p class="coverage-modal-copy" id="coverageModalCopy"></p>
+      <div class="coverage-country-list" id="coverageCountryList"></div>
+    </div>
+  </dialog>
+
+  <dialog class="coverage-modal" id="packageLogicModal">
+    <div class="coverage-modal-card">
+      <div class="coverage-modal-head">
+        <div>
+          <p class="section-label">Package logic</p>
+          <h3>Zone details</h3>
+        </div>
+        <button class="ghost-btn" id="closePackageLogicModalBtn" type="button">Close</button>
+      </div>
+      <div class="logic-grid">
+        <article class="zone-box zone-a">
+          <h4>Zone A</h4>
+          <p>Top Destination zone covering 70 countries.</p>
+        </article>
+        <article class="zone-box zone-b">
+          <h4>Zone B</h4>
+          <p>Includes every Zone A country and adds 35 more, for about 105 in total.</p>
+        </article>
+        <article class="zone-box zone-global">
+          <h4>Global</h4>
+          <p>Worldwide zone covering roughly 170 to 200 countries.</p>
+        </article>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
