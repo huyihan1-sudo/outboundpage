@@ -1,195 +1,275 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Travel Data Portal</title>
+  <title>EECONNECT Maps Leads</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="hero">
-      <nav class="topbar">
-        <div class="brand">
-          <span class="brand-mark">EE</span>
-          <div>
-            <p class="eyebrow">Global Travel Data</p>
-            <h1>EECONNECT Portal</h1>
-          </div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">EE</span>
+        <div>
+          <p>Google Maps Leads</p>
+          <strong>EECONNECT</strong>
         </div>
-        <div class="topbar-note">Zone-based roaming plans for multi-country trips</div>
+      </div>
+
+      <nav class="nav-list" aria-label="主要模块">
+        <a href="#searchPanel" class="is-active">搜索任务</a>
+        <a href="#resultsPanel">结果列表</a>
+        <a href="#logsPanel">日志监控</a>
+        <a href="#setupPanel">运行环境</a>
       </nav>
 
-      <section class="hero-grid">
-        <div class="hero-copy">
-          <p class="hero-kicker">Outbound Package Builder</p>
-          <div class="hero-title-row">
-            <h2>Match the right travel plan for every country on your trip</h2>
-            <button class="text-link" id="openHowItWorksBtn" type="button">How it works</button>
-          </div>
-          <p class="hero-text">
-            Search multiple destinations in one flow. The portal will decide whether
-            Zone A, Zone B, or Global is required, then surface the lowest-priced
-            eligible recommendation first.
-          </p>
+      <div class="sidebar-status">
+        <span class="status-dot" id="runtimeDot"></span>
+        <div>
+          <p id="runtimeLabel">检测运行环境中</p>
+          <small id="runtimeDetail">gosom / Docker</small>
+        </div>
+      </div>
+    </aside>
 
+    <main class="workspace">
+      <header class="workspace-header">
+        <div>
+          <p class="eyebrow">Open-source runner: gosom/google-maps-scraper</p>
+          <h1>本地商家数据采集工具</h1>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-btn" id="refreshHealthBtn" type="button">刷新环境</button>
+          <button class="primary-btn" id="startBtn" type="button">开始搜索</button>
+        </div>
+      </header>
+
+      <section class="metrics-grid" aria-label="任务指标">
+        <div class="metric">
+          <span>任务状态</span>
+          <strong id="jobStatus">未开始</strong>
+        </div>
+        <div class="metric">
+          <span>有效门店</span>
+          <strong id="leadCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>查询组合</span>
+          <strong id="queryCount">24</strong>
+        </div>
+        <div class="metric">
+          <span>运行模式</span>
+          <strong id="runnerMode">待检测</strong>
         </div>
       </section>
-    </header>
 
-    <main class="portal-layout">
-      <section class="selector-panel card">
-        <div class="section-heading">
-          <div>
-            <p class="section-label">Step 1</p>
-            <h3>Select destinations</h3>
-          </div>
-          <button class="ghost-btn" id="clearSelectionBtn" type="button">Clear</button>
-        </div>
-
-        <label class="searchbox" for="countrySearch">
-          <span class="search-icon">Search</span>
-          <input
-            id="countrySearch"
-            type="text"
-            autocomplete="off"
-            placeholder="Search countries, for example Japan, France, UAE"
-          >
-        </label>
-
-        <div class="selected-tags" id="selectedTags"></div>
-
-        <div class="quick-picks">
-          <button class="chip" type="button" data-country="Japan">Japan</button>
-          <button class="chip" type="button" data-country="Singapore">Singapore</button>
-          <button class="chip" type="button" data-country="United States">United States</button>
-          <button class="chip" type="button" data-country="France">France</button>
-          <button class="chip" type="button" data-country="UAE">UAE</button>
-          <button class="chip" type="button" data-country="Brazil">Brazil</button>
-        </div>
-
-        <div class="search-results is-hidden" id="searchResults"></div>
-
-        <div class="selection-groups" id="selectionGroups"></div>
-
-        <div class="match-zone-block">
-          <div class="section-heading compact-heading">
+      <section class="content-grid">
+        <form class="panel search-panel" id="searchPanel">
+          <div class="panel-heading">
             <div>
-              <p class="section-label">Matched zone</p>
-              <h3>Best-fit coverage</h3>
+              <p class="section-label">Step 1</p>
+              <h2>填写城市和关键词</h2>
             </div>
-            <button class="text-link" id="openPackageLogicBtn" type="button">Package logic</button>
+            <button class="text-btn" id="resetBtn" type="button">恢复默认</button>
           </div>
 
-          <div class="zone-rail zone-rail-inline" id="zoneRail">
-            <div class="zone-rail-line"></div>
-            <article class="zone-stop" data-zone-stop="Zone A">
-              <span class="zone-stop-dot"></span>
-              <strong>Zone A</strong>
-              <small>Top destinations - 70 countries</small>
-            </article>
-            <article class="zone-stop" data-zone-stop="Zone B">
-              <span class="zone-stop-dot"></span>
-              <strong>Zone B</strong>
-              <small>Extended coverage - 105 countries</small>
-            </article>
-            <article class="zone-stop" data-zone-stop="Global">
-              <span class="zone-stop-dot"></span>
-              <strong>Zone C / Global</strong>
-              <small>Worldwide reach - up to 200 countries</small>
-            </article>
-          </div>
-        </div>
-      </section>
+          <label class="field-block">
+            <span>城市，每行一个</span>
+            <textarea id="citiesInput" rows="5" spellcheck="false">Los Angeles, CA
+New York, NY
+Boston, MA</textarea>
+          </label>
 
-      <section class="plan-panel">
-        <div class="card recommendation-card">
-          <div class="section-heading">
+          <label class="field-block">
+            <span>关键词，每行一个</span>
+            <textarea id="keywordsInput" rows="8" spellcheck="false">wireless store
+cell phone store
+mobile phone repair
+phone repair
+iPhone repair
+computer repair
+computer store
+electronics repair</textarea>
+          </label>
+
+          <label class="field-block">
+            <span>排除词（反向词），每行一个 — 店名或类别含有这些词的结果将被过滤</span>
+            <textarea id="negativeKeywordsInput" rows="6" spellcheck="false">T-Mobile
+Verizon
+AT&T
+Sprint
+Metro by T-Mobile
+Cricket Wireless
+Boost Mobile
+Best Buy
+Walmart
+Target
+Costco
+Apple Store</textarea>
+          </label>
+
+          <div class="options-grid">
+            <label class="field-block">
+              <span>抓取深度</span>
+              <input id="depthInput" type="number" min="1" max="20" value="1">
+            </label>
+            <label class="field-block">
+              <span>并发数</span>
+              <input id="concurrencyInput" type="number" min="1" max="16" value="2">
+            </label>
+            <label class="field-block">
+              <span>停滞退出</span>
+              <select id="inactivityInput">
+                <option value="3m">3 分钟</option>
+                <option value="5m">5 分钟</option>
+                <option value="10m">10 分钟</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="toggles">
+            <label><input id="fastModeInput" type="checkbox"> 快速模式</label>
+            <label><input id="emailInput" type="checkbox"> 抓取网站邮箱</label>
+            <label><input id="extraReviewsInput" type="checkbox"> 抓取更多评论</label>
+          </div>
+
+          <div class="options-grid">
+            <label class="field-block">
+              <span>快速模式中心点，可选</span>
+              <input id="geoInput" type="text" placeholder="42.3601,-71.0589">
+            </label>
+            <label class="field-block">
+              <span>半径，米</span>
+              <input id="radiusInput" type="number" min="100" max="50000" value="10000">
+            </label>
+            <label class="field-block">
+              <span>缩放级别</span>
+              <input id="zoomInput" type="number" min="1" max="21" value="15">
+            </label>
+          </div>
+
+          <label class="field-block">
+            <span>代理，可选，逗号分隔</span>
+            <input id="proxiesInput" type="text" placeholder="http://user:pass@host:port,socks5://host:port">
+          </label>
+
+          <div class="query-preview">
+            <div>
+              <strong>查询预览</strong>
+              <span id="queryPreviewHint">将生成 24 个 Google Maps 查询</span>
+            </div>
+            <ol id="queryPreview"></ol>
+          </div>
+        </form>
+
+        <section class="panel setup-panel" id="setupPanel">
+          <div class="panel-heading">
             <div>
               <p class="section-label">Step 2</p>
-              <h3>Recommended plans</h3>
-            </div>
-            <div class="mode-toggle" id="modeToggle">
-              <button class="mode-btn is-active is-recommended" type="button" data-mode="continuous">
-                Subscription
-                <span class="mode-recommend-tag">Recommended</span>
-              </button>
-              <button class="mode-btn" type="button" data-mode="oneTime">One-time</button>
+              <h2>运行环境</h2>
             </div>
           </div>
 
-          <div class="match-summary" id="matchSummary"></div>
+          <div class="setup-list">
+            <div>
+              <span>gosom 二进制</span>
+              <strong id="binaryStatus">检测中</strong>
+              <small id="binaryPath"></small>
+            </div>
+            <div>
+              <span>Docker</span>
+              <strong id="dockerStatus">检测中</strong>
+              <small>未安装 Docker 时使用本地二进制</small>
+            </div>
+            <div>
+              <span>结果目录</span>
+              <strong>data/gosom/jobs</strong>
+              <small>每个任务单独保存 input、raw、clean、logs</small>
+            </div>
+          </div>
 
-          <div class="recommended-slot" id="recommendedSlot"></div>
+          <div class="setup-actions">
+            <button class="secondary-btn" id="copyInstallBtn" type="button">复制安装命令</button>
+            <button class="secondary-btn" id="openRepoBtn" type="button">打开 GitHub</button>
+          </div>
 
-          <div class="more-plans" id="morePlansWrap">
-            <button class="show-more-btn" id="showMoreBtn" type="button" hidden>Show more options</button>
-            <div class="plan-list is-collapsed" id="morePlansList"></div>
+          <pre class="command-box" id="installCommand">powershell -ExecutionPolicy Bypass -File scripts\install-gosom.ps1</pre>
+        </section>
+      </section>
+
+      <section class="panel results-panel" id="resultsPanel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-label">Step 3</p>
+            <h2>搜索结果</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="secondary-btn" id="downloadCsvBtn" type="button" disabled>CSV</button>
+            <button class="secondary-btn" id="downloadJsonBtn" type="button" disabled>JSON</button>
           </div>
         </div>
+
+        <div class="results-toolbar">
+          <label>
+            <span>城市筛选</span>
+            <select id="cityFilter">
+              <option value="">全部城市</option>
+            </select>
+          </label>
+          <label>
+            <span>每页显示</span>
+            <select id="pageSizeSelect">
+              <option value="25">25 条</option>
+              <option value="50">50 条</option>
+              <option value="100">100 条</option>
+            </select>
+          </label>
+          <div class="pagination-summary" id="paginationSummary">暂无结果</div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>店铺名</th>
+                <th>地址</th>
+                <th>电话</th>
+                <th>城市</th>
+                <th>图片</th>
+                <th>地图</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody">
+              <tr>
+                <td colspan="6" class="empty-state">填写城市后点击开始搜索，结果会显示在这里。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar">
+          <button class="secondary-btn" id="prevPageBtn" type="button" disabled>上一页</button>
+          <span id="pageInfo">第 0 / 0 页</span>
+          <button class="secondary-btn" id="nextPageBtn" type="button" disabled>下一页</button>
+        </div>
+      </section>
+
+      <section class="panel logs-panel" id="logsPanel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-label">Step 4</p>
+            <h2>日志和监控</h2>
+          </div>
+          <span id="currentJobId">无任务</span>
+        </div>
+        <pre class="log-box" id="logBox">等待任务启动...</pre>
       </section>
     </main>
   </div>
-
-  <dialog class="coverage-modal" id="howItWorksModal">
-    <div class="coverage-modal-card">
-      <div class="coverage-modal-head">
-        <div>
-          <p class="section-label">How it works</p>
-          <h3>How plan matching works</h3>
-        </div>
-        <button class="ghost-btn" id="closeHowItWorksModalBtn" type="button">Close</button>
-      </div>
-      <div class="modal-list">
-        <p>1. Search or click countries and build a multi-stop trip.</p>
-        <p>2. The portal matches the lowest zone that covers every selected destination.</p>
-        <p>3. Subscription is shown first, while broader options stay hidden until the user asks to see more.</p>
-      </div>
-    </div>
-  </dialog>
-
-  <dialog class="coverage-modal" id="coverageModal">
-    <div class="coverage-modal-card">
-      <div class="coverage-modal-head">
-        <div>
-          <p class="section-label">Coverage</p>
-          <h3 id="coverageModalTitle">Zone coverage</h3>
-        </div>
-        <button class="ghost-btn" id="closeCoverageModalBtn" type="button">Close</button>
-      </div>
-      <p class="coverage-modal-copy" id="coverageModalCopy"></p>
-      <div class="coverage-country-list" id="coverageCountryList"></div>
-    </div>
-  </dialog>
-
-  <dialog class="coverage-modal" id="packageLogicModal">
-    <div class="coverage-modal-card">
-      <div class="coverage-modal-head">
-        <div>
-          <p class="section-label">Package logic</p>
-          <h3>Zone details</h3>
-        </div>
-        <button class="ghost-btn" id="closePackageLogicModalBtn" type="button">Close</button>
-      </div>
-      <div class="logic-grid">
-        <article class="zone-box zone-a">
-          <h4>Zone A</h4>
-          <p>Top Destination zone covering 70 countries.</p>
-        </article>
-        <article class="zone-box zone-b">
-          <h4>Zone B</h4>
-          <p>Includes every Zone A country and adds 35 more, for about 105 in total.</p>
-        </article>
-        <article class="zone-box zone-global">
-          <h4>Global</h4>
-          <p>Worldwide zone covering roughly 170 to 200 countries.</p>
-        </article>
-      </div>
-    </div>
-  </dialog>
 
   <script src="script.js"></script>
 </body>

@@ -1,519 +1,420 @@
-const countries = [
-  { name: "Japan", zone: "Zone A" },
-  { name: "Singapore", zone: "Zone A" },
-  { name: "South Korea", zone: "Zone A" },
-  { name: "France", zone: "Zone A" },
-  { name: "Germany", zone: "Zone A" },
-  { name: "United Kingdom", zone: "Zone A" },
-  { name: "Italy", zone: "Zone A" },
-  { name: "Spain", zone: "Zone A" },
-  { name: "United States", zone: "Zone A" },
-  { name: "Canada", zone: "Zone A" },
-  { name: "Mexico", zone: "Zone A" },
-  { name: "Thailand", zone: "Zone A" },
-  { name: "Indonesia", zone: "Zone A" },
-  { name: "Australia", zone: "Zone A" },
-  { name: "New Zealand", zone: "Zone A" },
-  { name: "UAE", zone: "Zone B" },
-  { name: "Saudi Arabia", zone: "Zone B" },
-  { name: "Qatar", zone: "Zone B" },
-  { name: "Turkey", zone: "Zone B" },
-  { name: "India", zone: "Zone B" },
-  { name: "Vietnam", zone: "Zone B" },
-  { name: "Philippines", zone: "Zone B" },
-  { name: "Malaysia", zone: "Zone B" },
-  { name: "South Africa", zone: "Zone B" },
-  { name: "Egypt", zone: "Zone B" },
-  { name: "Brazil", zone: "Global" },
-  { name: "Argentina", zone: "Global" },
-  { name: "Chile", zone: "Global" },
-  { name: "Peru", zone: "Global" },
-  { name: "Morocco", zone: "Global" },
-  { name: "Kenya", zone: "Global" },
-  { name: "Nigeria", zone: "Global" },
-  { name: "Iceland", zone: "Global" },
-  { name: "Greenland", zone: "Global" },
-  { name: "Kazakhstan", zone: "Global" }
-];
-
-const planCatalog = [
-  {
-    zone: "Zone A",
-    coverage: "70 countries",
-    popular: "Top Destination",
-    oneTime: [
-      { size: "5GB", price: 24, validity: "30 days", speed: "5G / 4G" },
-      { size: "10GB", price: 39, validity: "30 days", speed: "5G / 4G" },
-      { size: "20GB", price: 69, validity: "30 days", speed: "5G / 4G" },
-      { size: "50GB", price: 149, validity: "30 days", speed: "5G / 4G" },
-      { size: "100GB", price: 249, validity: "30 days", speed: "5G / 4G" }
-    ]
-  },
-  {
-    zone: "Zone B",
-    coverage: "105 countries",
-    popular: "Extended Coverage",
-    oneTime: [
-      { size: "5GB", price: 29, validity: "30 days", speed: "5G / 4G" },
-      { size: "10GB", price: 45, validity: "30 days", speed: "5G / 4G" },
-      { size: "20GB", price: 79, validity: "30 days", speed: "5G / 4G" },
-      { size: "50GB", price: 169, validity: "30 days", speed: "5G / 4G" },
-      { size: "100GB", price: 279, validity: "30 days", speed: "5G / 4G" }
-    ]
-  },
-  {
-    zone: "Global",
-    coverage: "170-200 countries",
-    popular: "Worldwide Reach",
-    oneTime: [
-      { size: "5GB", price: 35, validity: "30 days", speed: "5G / 4G" },
-      { size: "10GB", price: 55, validity: "30 days", speed: "5G / 4G" },
-      { size: "20GB", price: 95, validity: "30 days", speed: "5G / 4G" },
-      { size: "50GB", price: 199, validity: "30 days", speed: "5G / 4G" },
-      { size: "100GB", price: 329, validity: "30 days", speed: "5G / 4G" }
-    ]
-  }
-];
-
-const zonePriority = { "Zone A": 1, "Zone B": 2, "Global": 3 };
-const zoneCoverage = {
-  "Zone A": ["Zone A"],
-  "Zone B": ["Zone A", "Zone B"],
-  "Global": ["Zone A", "Zone B", "Global"]
+const defaults = {
+  cities: ["Los Angeles, CA", "New York, NY", "Boston, MA"],
+  keywords: [
+    "wireless store",
+    "cell phone store",
+    "mobile phone repair",
+    "phone repair",
+    "iPhone repair",
+    "computer repair",
+    "computer store",
+    "electronics repair"
+  ],
+  negativeKeywords: [
+    "T-Mobile",
+    "Verizon",
+    "AT&T",
+    "Sprint",
+    "Metro by T-Mobile",
+    "Cricket Wireless",
+    "Boost Mobile",
+    "Best Buy",
+    "Walmart",
+    "Target",
+    "Costco",
+    "Apple Store"
+  ]
 };
 
-const selectedCountries = new Set(["Japan", "Singapore"]);
-let currentMode = "continuous";
-let showAllPlans = false;
-let searchTerm = "";
+const state = {
+  currentJobId: null,
+  pollTimer: null,
+  results: [],
+  filteredResults: [],
+  page: 1,
+  pageSize: 25
+};
 
-const searchInput = document.getElementById("countrySearch");
-const selectedTags = document.getElementById("selectedTags");
-const searchResults = document.getElementById("searchResults");
-const selectionGroups = document.getElementById("selectionGroups");
-const matchSummary = document.getElementById("matchSummary");
-const recommendedSlot = document.getElementById("recommendedSlot");
-const morePlansList = document.getElementById("morePlansList");
-const showMoreBtn = document.getElementById("showMoreBtn");
-const clearSelectionBtn = document.getElementById("clearSelectionBtn");
-const modeToggle = document.getElementById("modeToggle");
-const zoneRail = document.getElementById("zoneRail");
-const coverageModal = document.getElementById("coverageModal");
-const closeCoverageModalBtn = document.getElementById("closeCoverageModalBtn");
-const coverageModalTitle = document.getElementById("coverageModalTitle");
-const coverageModalCopy = document.getElementById("coverageModalCopy");
-const coverageCountryList = document.getElementById("coverageCountryList");
-const howItWorksModal = document.getElementById("howItWorksModal");
-const openHowItWorksBtn = document.getElementById("openHowItWorksBtn");
-const closeHowItWorksModalBtn = document.getElementById("closeHowItWorksModalBtn");
-const packageLogicModal = document.getElementById("packageLogicModal");
-const openPackageLogicBtn = document.getElementById("openPackageLogicBtn");
-const closePackageLogicModalBtn = document.getElementById("closePackageLogicModalBtn");
+const els = {
+  citiesInput: document.getElementById("citiesInput"),
+  keywordsInput: document.getElementById("keywordsInput"),
+  depthInput: document.getElementById("depthInput"),
+  concurrencyInput: document.getElementById("concurrencyInput"),
+  inactivityInput: document.getElementById("inactivityInput"),
+  fastModeInput: document.getElementById("fastModeInput"),
+  emailInput: document.getElementById("emailInput"),
+  extraReviewsInput: document.getElementById("extraReviewsInput"),
+  geoInput: document.getElementById("geoInput"),
+  radiusInput: document.getElementById("radiusInput"),
+  zoomInput: document.getElementById("zoomInput"),
+  negativeKeywordsInput: document.getElementById("negativeKeywordsInput"),
+  proxiesInput: document.getElementById("proxiesInput"),
+  startBtn: document.getElementById("startBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  refreshHealthBtn: document.getElementById("refreshHealthBtn"),
+  copyInstallBtn: document.getElementById("copyInstallBtn"),
+  openRepoBtn: document.getElementById("openRepoBtn"),
+  queryCount: document.getElementById("queryCount"),
+  queryPreview: document.getElementById("queryPreview"),
+  queryPreviewHint: document.getElementById("queryPreviewHint"),
+  runtimeDot: document.getElementById("runtimeDot"),
+  runtimeLabel: document.getElementById("runtimeLabel"),
+  runtimeDetail: document.getElementById("runtimeDetail"),
+  runnerMode: document.getElementById("runnerMode"),
+  binaryStatus: document.getElementById("binaryStatus"),
+  binaryPath: document.getElementById("binaryPath"),
+  dockerStatus: document.getElementById("dockerStatus"),
+  jobStatus: document.getElementById("jobStatus"),
+  leadCount: document.getElementById("leadCount"),
+  currentJobId: document.getElementById("currentJobId"),
+  logBox: document.getElementById("logBox"),
+  resultsBody: document.getElementById("resultsBody"),
+  cityFilter: document.getElementById("cityFilter"),
+  pageSizeSelect: document.getElementById("pageSizeSelect"),
+  paginationSummary: document.getElementById("paginationSummary"),
+  prevPageBtn: document.getElementById("prevPageBtn"),
+  nextPageBtn: document.getElementById("nextPageBtn"),
+  pageInfo: document.getElementById("pageInfo"),
+  downloadCsvBtn: document.getElementById("downloadCsvBtn"),
+  downloadJsonBtn: document.getElementById("downloadJsonBtn"),
+  installCommand: document.getElementById("installCommand")
+};
 
-function buildSubscriptionPlans(oneTimePlans) {
-  return oneTimePlans.map((plan) => ({
-    ...plan,
-    price: plan.price - 5,
-    label: "Subscription",
-    renewal: "Monthly auto-renew",
-    savings: "10%"
-  }));
+function linesFrom(text) {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
 }
 
-const fullCatalog = planCatalog.map((zonePlan) => ({
-  ...zonePlan,
-  continuous: buildSubscriptionPlans(zonePlan.oneTime)
-}));
-
-function getCountryZone(name) {
-  return countries.find((country) => country.name === name)?.zone;
+function buildQueries() {
+  const cities = linesFrom(els.citiesInput.value);
+  const keywords = linesFrom(els.keywordsInput.value);
+  return cities.flatMap((city) => keywords.map((keyword) => ({
+    city,
+    keyword,
+    query: `${keyword} in ${city}`
+  })));
 }
 
-function getRequiredZone() {
-  if (!selectedCountries.size) return null;
-  let highestZone = "Zone A";
+function updateQueryPreview() {
+  const queries = buildQueries();
+  els.queryCount.textContent = String(queries.length);
+  els.queryPreviewHint.textContent = `将生成 ${queries.length} 个 Google Maps 查询`;
+  els.queryPreview.innerHTML = queries
+    .slice(0, 30)
+    .map((item) => `<li>${escapeHtml(item.query)}</li>`)
+    .join("");
+  if (queries.length > 30) {
+    const li = document.createElement("li");
+    li.textContent = `还有 ${queries.length - 30} 个查询`;
+    els.queryPreview.appendChild(li);
+  }
+}
 
-  selectedCountries.forEach((country) => {
-    const zone = getCountryZone(country);
-    if (zone && zonePriority[zone] > zonePriority[highestZone]) {
-      highestZone = zone;
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    ...options
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || `Request failed: ${response.status}`);
+  }
+  return payload;
+}
+
+async function refreshHealth() {
+  try {
+    const health = await fetchJson("/api/health");
+    els.runnerMode.textContent = health.runnerMode || "未就绪";
+    els.binaryStatus.textContent = health.binary.available ? "可用" : "未安装";
+    els.binaryPath.textContent = health.binary.path || "tools/gosom/google-maps-scraper.exe";
+    els.dockerStatus.textContent = health.docker.available ? "可用" : "未安装";
+    els.runtimeDot.className = `status-dot ${health.ready ? "is-ok" : "is-bad"}`;
+    els.runtimeLabel.textContent = health.ready ? "运行环境可用" : "需要安装运行器";
+    els.runtimeDetail.textContent = health.ready
+      ? `${health.runnerMode} 已就绪`
+      : "请先运行安装命令或安装 Docker";
+    els.startBtn.disabled = !health.ready;
+    loadLatestJob();
+  } catch (error) {
+    els.runtimeDot.className = "status-dot is-bad";
+    els.runtimeLabel.textContent = "环境检测失败";
+    els.runtimeDetail.textContent = error.message;
+    els.startBtn.disabled = true;
+  }
+}
+
+async function loadLatestJob() {
+  if (state.currentJobId) return;
+  try {
+    const latest = await fetchJson("/api/jobs/latest");
+    if (!latest || latest.job === null || !latest.id) return;
+    state.currentJobId = latest.id;
+    renderJob(latest);
+  } catch {
+    // The latest job endpoint is a convenience only.
+  }
+}
+
+async function startJob() {
+  const cities = linesFrom(els.citiesInput.value);
+  const keywords = linesFrom(els.keywordsInput.value);
+
+  if (!cities.length || !keywords.length) {
+    setLog("城市和关键词都不能为空。");
+    return;
+  }
+
+  els.startBtn.disabled = true;
+  setStatus("启动中");
+  setLog("正在创建采集任务...");
+  clearResults();
+
+  try {
+    const payload = await fetchJson("/api/search", {
+      method: "POST",
+      body: JSON.stringify({
+        cities,
+        keywords,
+        depth: Number(els.depthInput.value || 1),
+        concurrency: Number(els.concurrencyInput.value || 2),
+        exitOnInactivity: els.inactivityInput.value,
+        fastMode: els.fastModeInput.checked,
+        geo: els.geoInput.value.trim(),
+        radius: Number(els.radiusInput.value || 10000),
+        zoom: Number(els.zoomInput.value || 15),
+        email: els.emailInput.checked,
+        extraReviews: els.extraReviewsInput.checked,
+        negativeKeywords: linesFrom(els.negativeKeywordsInput.value),
+        proxies: els.proxiesInput.value.trim()
+      })
+    });
+
+    state.currentJobId = payload.jobId;
+    els.currentJobId.textContent = payload.jobId;
+    setStatus("运行中");
+    startPolling();
+  } catch (error) {
+    setStatus("启动失败");
+    setLog(error.message);
+    els.startBtn.disabled = false;
+  }
+}
+
+function startPolling() {
+  if (state.pollTimer) {
+    clearInterval(state.pollTimer);
+  }
+  pollJob();
+  state.pollTimer = setInterval(pollJob, 2500);
+}
+
+async function pollJob() {
+  if (!state.currentJobId) return;
+
+  try {
+    const job = await fetchJson(`/api/jobs/${encodeURIComponent(state.currentJobId)}`);
+    renderJob(job);
+    if (["completed", "failed"].includes(job.status)) {
+      clearInterval(state.pollTimer);
+      state.pollTimer = null;
+      els.startBtn.disabled = false;
     }
-  });
-
-  return highestZone;
+  } catch (error) {
+    setLog(error.message);
+  }
 }
 
-function getEligibleZones(requiredZone) {
-  if (!requiredZone) return [];
-  return fullCatalog.filter((plan) => zoneCoverage[plan.zone].includes(requiredZone));
-}
+function renderJob(job) {
+  const label = {
+    queued: "排队中",
+    running: "运行中",
+    completed: "已完成",
+    failed: "失败"
+  }[job.status] || job.status;
 
-function getCountriesForCoverage(zoneName) {
-  return countries
-    .filter((country) => zoneCoverage[zoneName].includes(country.zone))
-    .map((country) => country.name)
-    .sort((a, b) => a.localeCompare(b));
-}
+  setStatus(label);
+  els.currentJobId.textContent = job.id;
+  els.leadCount.textContent = String(job.counts?.clean || 0);
+  els.logBox.textContent = job.logs || "等待日志...";
 
-function getRecommendedPlans() {
-  const requiredZone = getRequiredZone();
-  if (!requiredZone) {
-    return { requiredZone: null, eligiblePlans: [] };
+  if (job.results?.length) {
+    setResults(job.results);
+  } else if (job.preview?.length) {
+    setResults(job.preview);
   }
 
-  const eligibleZones = getEligibleZones(requiredZone).map((zonePlan) => {
-    const plans = zonePlan[currentMode];
-    const cheapest = plans[0];
-    return {
-      zone: zonePlan.zone,
-      coverage: zonePlan.coverage,
-      popular: zonePlan.popular,
-      plan: cheapest
-    };
-  });
-
-  eligibleZones.sort((a, b) => a.plan.price - b.plan.price || zonePriority[a.zone] - zonePriority[b.zone]);
-
-  return {
-    requiredZone,
-    eligiblePlans: eligibleZones
-  };
+  const downloadable = job.status === "completed" && (job.counts?.clean || 0) > 0;
+  els.downloadCsvBtn.disabled = !downloadable;
+  els.downloadJsonBtn.disabled = !downloadable;
 }
 
-function renderSelectedTags() {
-  const entries = [...selectedCountries];
-  selectedTags.innerHTML = entries.length
-    ? entries
-        .map(
-          (name) => `
-            <div class="tag">
-              <span>${name}</span>
-              <button type="button" data-remove="${name}" aria-label="Remove ${name}">x</button>
-            </div>
-          `
-        )
-        .join("")
-    : '<span class="mini-note">No destination selected yet. Start with search or quick picks below.</span>';
+function setResults(rows) {
+  const previousCity = els.cityFilter.value;
+  state.results = rows || [];
+  state.page = 1;
+  updateCityFilter(previousCity);
+  applyFilters();
 }
 
-function renderSearchResults() {
-  if (!searchTerm) {
-    searchResults.classList.add("is-hidden");
-    searchResults.innerHTML = "";
-    return;
-  }
-
-  const filtered = countries
-    .filter((country) => country.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .slice(0, 6);
-
-  searchResults.classList.remove("is-hidden");
-  searchResults.innerHTML = filtered.length
-    ? filtered
-        .map((country) => {
-          const isSelected = selectedCountries.has(country.name);
-          return `
-            <button class="country-item ${isSelected ? "is-selected" : ""}" type="button" data-country-select="${country.name}">
-              <span class="country-meta">
-                <strong>${country.name}</strong>
-                <small>Available in ${country.zone}</small>
-              </span>
-              <span class="pill">${isSelected ? "Selected" : country.zone}</span>
-            </button>
-          `;
-        })
-        .join("")
-    : `
-      <div class="empty-state">
-        No matching country found in the demo dataset.
-      </div>
-    `;
-}
-
-function renderSelectionGroups() {
-  if (!selectedCountries.size) {
-    selectionGroups.innerHTML = `
-      <div class="empty-state">
-        Keep this area clean until the customer starts building a trip. Once countries are selected,
-        they will be grouped here by zone.
-      </div>
-    `;
-    return;
-  }
-
-  const grouped = {
-    "Zone A": [],
-    "Zone B": [],
-    "Global": []
-  };
-
-  [...selectedCountries].forEach((countryName) => {
-    const zone = getCountryZone(countryName);
-    if (zone) grouped[zone].push(countryName);
-  });
-
-  selectionGroups.innerHTML = Object.entries(grouped)
-    .filter(([, items]) => items.length)
-    .map(
-      ([zone, items]) => `
-        <section class="selection-group">
-          <div class="selection-group-header">
-            <h4>${zone}</h4>
-            <span class="pill">${items.length} selected</span>
-          </div>
-          <div class="selection-group-tags">
-            ${items.map((item) => `<span class="selection-country-pill">${item}</span>`).join("")}
-          </div>
-        </section>
-      `
-    )
+function updateCityFilter(selectedValue = "") {
+  const cities = Array.from(new Set(state.results.map((row) => row.city).filter(Boolean))).sort();
+  els.cityFilter.innerHTML = '<option value="">全部城市</option>' + cities
+    .map((city) => `<option value="${escapeAttr(city)}">${escapeHtml(city)}</option>`)
     .join("");
+
+  if (cities.includes(selectedValue)) {
+    els.cityFilter.value = selectedValue;
+  }
 }
 
-function renderZoneRail(requiredZone) {
-  zoneRail.querySelectorAll("[data-zone-stop]").forEach((node) => {
-    node.classList.toggle("is-active", node.dataset.zoneStop === requiredZone);
-  });
+function applyFilters() {
+  const city = els.cityFilter.value;
+  state.pageSize = Number(els.pageSizeSelect.value || 25);
+  state.filteredResults = city
+    ? state.results.filter((row) => row.city === city)
+    : [...state.results];
+  state.page = Math.min(state.page, totalPages());
+  if (state.page < 1) state.page = 1;
+  renderCurrentPage();
 }
 
-function renderSummaryAndPlans() {
-  const result = getRecommendedPlans();
-  renderZoneRail(result.requiredZone);
+function totalPages() {
+  return Math.max(1, Math.ceil(state.filteredResults.length / state.pageSize));
+}
 
-  if (!result.requiredZone) {
-    matchSummary.innerHTML = `
-      <div class="empty-state">
-        Select one or more destinations first. The portal will auto-match the right zone
-        and recommend the lowest-priced eligible plan.
-      </div>
-    `;
-    recommendedSlot.innerHTML = "";
-    morePlansList.innerHTML = "";
-    showMoreBtn.hidden = true;
+function renderCurrentPage() {
+  const total = state.filteredResults.length;
+  const pages = totalPages();
+  const start = total ? (state.page - 1) * state.pageSize : 0;
+  const end = Math.min(start + state.pageSize, total);
+  const rows = state.filteredResults.slice(start, end);
+
+  els.paginationSummary.textContent = total
+    ? `显示 ${start + 1}-${end} / ${total} 条`
+    : "暂无结果";
+  els.pageInfo.textContent = total ? `第 ${state.page} / ${pages} 页` : "第 0 / 0 页";
+  els.prevPageBtn.disabled = !total || state.page <= 1;
+  els.nextPageBtn.disabled = !total || state.page >= pages;
+
+  if (!rows.length) {
+    els.resultsBody.innerHTML = '<tr><td colspan="6" class="empty-state">没有符合筛选条件的结果。</td></tr>';
     return;
   }
 
-  const countriesText = [...selectedCountries].join(", ");
-  const recommendation = result.eligiblePlans[0];
-  const otherPlans = result.eligiblePlans.slice(1);
-  const recurringCopy =
-    currentMode === "continuous"
-      ? "30-day subscription, renews monthly"
-      : "30-day one-time package";
-
-  matchSummary.innerHTML = `
-    <strong>${countriesText}</strong><br>
-    Based on the selected destinations, at least <strong>${result.requiredZone}</strong>
-    is required for full coverage. The portal is showing the cheapest eligible
-    ${currentMode === "continuous" ? "subscription" : "one-time"} option first,
-    with the remaining eligible zones available below.
-  `;
-
-  recommendedSlot.innerHTML = `
-    <article class="recommended-plan">
-      <div class="recommended-top">
-        <div>
-          <span class="recommend-badge">Recommended</span>
-          <h4 class="recommended-title">${recommendation.zone}</h4>
-          <div class="recommended-meta-row">
-            <p class="recommended-subtitle">${recommendation.popular}</p>
-            <button class="coverage-link" type="button" data-open-coverage="${recommendation.zone}">
-              Coverage
-            </button>
-          </div>
-        </div>
-        <div class="price-stack">
-          <span>${currentMode === "continuous" ? "starting from / 30 days" : "starting from / 30 days"}</span>
-          <strong>USD ${recommendation.plan.price}</strong>
-          ${
-            currentMode === "continuous"
-              ? `<span class="save-badge">Save ${recommendation.plan.savings}</span>`
-              : `<span>${recurringCopy}</span>`
-          }
-        </div>
-      </div>
-
-      <div class="size-grid">
-        ${fullCatalog
-          .find((item) => item.zone === recommendation.zone)
-          [currentMode]
-          .map(
-            (plan) => `
-              <article class="size-card">
-                <strong>${plan.size}</strong>
-                <span class="size-price">USD ${plan.price}</span>
-              </article>
-            `
-          )
-          .join("")}
-      </div>
-    </article>
-  `;
-
-  if (!otherPlans.length) {
-    morePlansList.innerHTML = "";
-    showMoreBtn.hidden = true;
-    return;
-  }
-
-  showMoreBtn.hidden = false;
-  showMoreBtn.textContent = showAllPlans ? "Hide more options" : `Show more options`;
-  morePlansList.classList.toggle("is-collapsed", !showAllPlans);
-  morePlansList.innerHTML = otherPlans
-    .map(
-      (item) => `
-        <article class="plan-item">
-          <div class="accordion-plan">
-            <div class="accordion-plan-header">
-              <div>
-                <h4>${item.zone}</h4>
-                <p>${item.coverage} coverage - higher-priced but broader option</p>
-              </div>
-              <div class="plan-price">
-                <strong>USD ${item.plan.price}</strong>
-                <span class="muted">30-day starting price</span>
-              </div>
-            </div>
-            <div class="compact-size-row">
-              ${fullCatalog
-                .find((zonePlan) => zonePlan.zone === item.zone)
-                [currentMode]
-                .map((plan) => `<span class="compact-size-pill">${plan.size} - USD ${plan.price}</span>`)
-                .join("")}
-            </div>
-          </div>
-        </article>
-      `
-    )
-    .join("");
+  els.resultsBody.innerHTML = rows.map((row) => `
+    <tr>
+      <td>${escapeHtml(row.store_name)}</td>
+      <td>${escapeHtml(row.address)}</td>
+      <td>${escapeHtml(row.phone)}</td>
+      <td>${escapeHtml(row.city)}</td>
+      <td>${row.image_url ? `<a href="${escapeAttr(row.image_url)}" target="_blank" rel="noreferrer">查看</a>` : ""}</td>
+      <td>${row.google_maps_url ? `<a href="${escapeAttr(row.google_maps_url)}" target="_blank" rel="noreferrer">打开</a>` : ""}</td>
+    </tr>
+  `).join("");
 }
 
-function render() {
-  renderSelectedTags();
-  renderSearchResults();
-  renderSelectionGroups();
-  renderSummaryAndPlans();
+function clearResults() {
+  els.leadCount.textContent = "0";
+  state.results = [];
+  state.filteredResults = [];
+  state.page = 1;
+  updateCityFilter();
+  els.paginationSummary.textContent = "暂无结果";
+  els.pageInfo.textContent = "第 0 / 0 页";
+  els.prevPageBtn.disabled = true;
+  els.nextPageBtn.disabled = true;
+  els.downloadCsvBtn.disabled = true;
+  els.downloadJsonBtn.disabled = true;
+  els.resultsBody.innerHTML = '<tr><td colspan="6" class="empty-state">任务运行中，结果会自动刷新。</td></tr>';
 }
 
-function toggleCountry(countryName) {
-  if (selectedCountries.has(countryName)) {
-    selectedCountries.delete(countryName);
-  } else {
-    selectedCountries.add(countryName);
-  }
-
-  showAllPlans = false;
-  searchInput.value = "";
-  searchTerm = "";
-  render();
+function setStatus(value) {
+  els.jobStatus.textContent = value;
 }
 
-searchInput.addEventListener("input", (event) => {
-  searchTerm = event.target.value.trim();
-  renderSearchResults();
-});
+function setLog(value) {
+  els.logBox.textContent = value;
+}
 
-document.addEventListener("click", (event) => {
-  const removeTarget = event.target.closest("[data-remove]");
-  if (removeTarget) {
-    selectedCountries.delete(removeTarget.dataset.remove);
-    showAllPlans = false;
-    render();
-    return;
+function download(format) {
+  if (!state.currentJobId) return;
+  window.location.href = `/api/jobs/${encodeURIComponent(state.currentJobId)}/download?format=${format}`;
+}
+
+function resetDefaults() {
+  els.citiesInput.value = defaults.cities.join("\n");
+  els.keywordsInput.value = defaults.keywords.join("\n");
+  els.negativeKeywordsInput.value = defaults.negativeKeywords.join("\n");
+  els.depthInput.value = "1";
+  els.concurrencyInput.value = "2";
+  els.inactivityInput.value = "3m";
+  els.fastModeInput.checked = false;
+  els.geoInput.value = "";
+  els.radiusInput.value = "10000";
+  els.zoomInput.value = "15";
+  els.emailInput.checked = false;
+  els.extraReviewsInput.checked = false;
+  els.proxiesInput.value = "";
+  updateQueryPreview();
+}
+
+async function copyInstallCommand() {
+  try {
+    await navigator.clipboard.writeText(els.installCommand.textContent.trim());
+    els.copyInstallBtn.textContent = "已复制";
+    setTimeout(() => {
+      els.copyInstallBtn.textContent = "复制安装命令";
+    }, 1600);
+  } catch {
+    setLog("复制失败，请手动复制安装命令。");
   }
+}
 
-  const selectTarget = event.target.closest("[data-country-select]");
-  if (selectTarget) {
-    toggleCountry(selectTarget.dataset.countrySelect);
-    return;
-  }
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-  const chipTarget = event.target.closest("[data-country]");
-  if (chipTarget) {
-    toggleCountry(chipTarget.dataset.country);
-  }
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/`/g, "&#096;");
+}
+
+[els.citiesInput, els.keywordsInput].forEach((input) => {
+  input.addEventListener("input", updateQueryPreview);
 });
 
-showMoreBtn.addEventListener("click", () => {
-  showAllPlans = !showAllPlans;
-  renderSummaryAndPlans();
+els.startBtn.addEventListener("click", startJob);
+els.resetBtn.addEventListener("click", resetDefaults);
+els.refreshHealthBtn.addEventListener("click", refreshHealth);
+els.copyInstallBtn.addEventListener("click", copyInstallCommand);
+els.openRepoBtn.addEventListener("click", () => {
+  window.open("https://github.com/gosom/google-maps-scraper", "_blank", "noreferrer");
+});
+els.downloadCsvBtn.addEventListener("click", () => download("csv"));
+els.downloadJsonBtn.addEventListener("click", () => download("json"));
+els.cityFilter.addEventListener("change", () => {
+  state.page = 1;
+  applyFilters();
+});
+els.pageSizeSelect.addEventListener("change", () => {
+  state.page = 1;
+  applyFilters();
+});
+els.prevPageBtn.addEventListener("click", () => {
+  state.page = Math.max(1, state.page - 1);
+  renderCurrentPage();
+});
+els.nextPageBtn.addEventListener("click", () => {
+  state.page = Math.min(totalPages(), state.page + 1);
+  renderCurrentPage();
 });
 
-clearSelectionBtn.addEventListener("click", () => {
-  selectedCountries.clear();
-  showAllPlans = false;
-  render();
-});
-
-modeToggle.addEventListener("click", (event) => {
-  const modeButton = event.target.closest("[data-mode]");
-  if (!modeButton) return;
-
-  currentMode = modeButton.dataset.mode;
-  document.querySelectorAll(".mode-btn").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.mode === currentMode);
-  });
-  showAllPlans = false;
-  renderSummaryAndPlans();
-});
-
-document.addEventListener("click", (event) => {
-  const coverageTrigger = event.target.closest("[data-open-coverage]");
-  if (!coverageTrigger) return;
-
-  const zoneName = coverageTrigger.dataset.openCoverage;
-  const coverageCountries = getCountriesForCoverage(zoneName);
-  coverageModalTitle.textContent = `${zoneName} coverage`;
-  coverageModalCopy.textContent =
-    zoneName === "Global"
-      ? "Global includes every country shown in the demo dataset and represents the broadest worldwide package."
-      : `${zoneName} includes the destinations below in the current demo dataset. Higher zones include lower-zone countries as well.`;
-  coverageCountryList.innerHTML = coverageCountries
-    .map((country) => `<span class="coverage-country-chip">${country}</span>`)
-    .join("");
-  coverageModal.showModal();
-});
-
-closeCoverageModalBtn.addEventListener("click", () => {
-  coverageModal.close();
-});
-
-coverageModal.addEventListener("click", (event) => {
-  const rect = coverageModal.getBoundingClientRect();
-  const isBackdropClick =
-    event.clientX < rect.left ||
-    event.clientX > rect.right ||
-    event.clientY < rect.top ||
-    event.clientY > rect.bottom;
-  if (isBackdropClick) coverageModal.close();
-});
-
-openHowItWorksBtn.addEventListener("click", () => {
-  howItWorksModal.showModal();
-});
-
-closeHowItWorksModalBtn.addEventListener("click", () => {
-  howItWorksModal.close();
-});
-
-openPackageLogicBtn.addEventListener("click", () => {
-  packageLogicModal.showModal();
-});
-
-closePackageLogicModalBtn.addEventListener("click", () => {
-  packageLogicModal.close();
-});
-
-[howItWorksModal, packageLogicModal].forEach((dialog) => {
-  dialog.addEventListener("click", (event) => {
-    const rect = dialog.getBoundingClientRect();
-    const isBackdropClick =
-      event.clientX < rect.left ||
-      event.clientX > rect.right ||
-      event.clientY < rect.top ||
-      event.clientY > rect.bottom;
-    if (isBackdropClick) dialog.close();
-  });
-});
-
-render();
+updateQueryPreview();
+refreshHealth();
