@@ -1,0 +1,23 @@
+{
+  "provider": "outscraper",
+  "language": "en",
+  "region": "US",
+  "limit_per_query": 500,
+  "qa_sample_per_city": 50,
+  "output_dir": "lead_scraper/output",
+  "cities": [
+    "Los Angeles, CA",
+    "New York, NY",
+    "Boston, MA"
+  ],
+  "keywords": [
+    "wireless store",
+    "cell phone store",
+    "mobile phone repair",
+    "phone repair",
+    "iPhone repair",
+    "computer repair",
+    "computer store",
+    "electronics repair"
+  ]
+}
