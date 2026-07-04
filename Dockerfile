@@ -1,12 +1,13 @@
-FROM node:24-bookworm-slim
+FROM gosom/google-maps-scraper:latest AS gosom-runtime
 
-ARG GOSOM_VERSION=1.12.1
+FROM node:24-bookworm-slim
 
 WORKDIR /app
 
 ENV HOME=/app
 ENV XDG_CACHE_HOME=/app/.cache
 ENV PLAYWRIGHT_BROWSERS_PATH=/app/.cache/ms-playwright
+ENV PLAYWRIGHT_DRIVER_PATH=/app/.cache
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -42,25 +43,12 @@ RUN npm install --omit=dev
 
 COPY . .
 
-RUN mkdir -p /app/tools/gosom \
-  && curl -L \
-    "https://github.com/gosom/google-maps-scraper/releases/download/v${GOSOM_VERSION}/google_maps_scraper-${GOSOM_VERSION}-linux-amd64" \
-    -o /app/tools/gosom/google-maps-scraper \
-  && chmod +x /app/tools/gosom/google-maps-scraper
-
-# Prewarm playwright-go while building the image so Render searches do not
-# depend on a runtime download from Playwright CDN mirrors.
-RUN mkdir -p /app/.cache /app/data/gosom/warmup \
-  && printf '%s\n' 'phone repair in Boston, MA #!#phone repair||Boston, MA' > /tmp/gosom-warmup-queries.txt \
-  && timeout 240s /app/tools/gosom/google-maps-scraper \
-    -input /tmp/gosom-warmup-queries.txt \
-    -results /tmp/gosom-warmup-results.json \
-    -json \
-    -depth 1 \
-    -c 1 \
-    -exit-on-inactivity 10s \
-    -lang en || true \
-  && rm -f /tmp/gosom-warmup-queries.txt /tmp/gosom-warmup-results.json
+RUN mkdir -p /app/tools/gosom /app/.cache
+COPY --from=gosom-runtime /usr/bin/google-maps-scraper /app/tools/gosom/google-maps-scraper
+COPY --from=gosom-runtime /opt/browsers /app/.cache/ms-playwright
+COPY --from=gosom-runtime /opt/ms-playwright-go /app/.cache/ms-playwright-go
+RUN chmod +x /app/tools/gosom/google-maps-scraper \
+  && chmod -R 755 /app/.cache/ms-playwright /app/.cache/ms-playwright-go
 
 ENV NODE_ENV=production
 ENV PORT=3000
