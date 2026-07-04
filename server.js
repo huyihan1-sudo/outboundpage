@@ -312,7 +312,7 @@ function runJob(job, options, health) {
           }
         } else {
           job.status = "failed";
-          job.error = `gosom exited with code ${code}`;
+          job.error = inferJobError(job, code);
         }
         touch(job);
         persistJob(job);
@@ -728,8 +728,18 @@ function getJob(id) {
 
 function getLatestJob() {
   return Array.from(jobs.values())
-    .filter((job) => job.status === "completed")
     .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0] || null;
+}
+
+function inferJobError(job, code) {
+  const logs = fs.existsSync(job.logPath) ? tailFile(job.logPath, 30000) : job.logsText || "";
+  if (/could not install driver|playwright-.*azureedge\.net|ms-playwright-go/i.test(logs)) {
+    return "Playwright driver download failed on the server. Redeploy with the warmed Docker image, then retry a small search.";
+  }
+  if (/context deadline exceeded|timeout/i.test(logs)) {
+    return "The scraper timed out before producing results. Try one city and one keyword first, with concurrency set to 1.";
+  }
+  return `gosom exited with code ${code}`;
 }
 
 function publicJob(job) {
