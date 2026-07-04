@@ -13,6 +13,44 @@ const TOOLS_DIR = path.join(ROOT, "tools", "gosom");
 const MAX_BODY_BYTES = 1024 * 1024;
 const PUBLIC_FILES = new Set(["/index.html", "/styles.css", "/script.js", "/favicon.ico"]);
 
+const CITY_EXPANSIONS = [
+  {
+    match: /^(new york|new york city|nyc|new york,\s*ny|nyc,\s*ny)$/i,
+    areas: [
+      "New York, NY",
+      "Manhattan, NY",
+      "Brooklyn, NY",
+      "Queens, NY",
+      "Bronx, NY",
+      "Staten Island, NY",
+      "Flushing, Queens, NY",
+      "Astoria, Queens, NY",
+      "Long Island City, Queens, NY",
+      "Jackson Heights, Queens, NY",
+      "Elmhurst, Queens, NY",
+      "Jamaica, Queens, NY",
+      "Forest Hills, Queens, NY",
+      "Bayside, Queens, NY",
+      "Sunnyside, Queens, NY",
+      "Williamsburg, Brooklyn, NY",
+      "Bushwick, Brooklyn, NY",
+      "Park Slope, Brooklyn, NY",
+      "Downtown Brooklyn, NY",
+      "Sunset Park, Brooklyn, NY",
+      "Bay Ridge, Brooklyn, NY",
+      "Crown Heights, Brooklyn, NY",
+      "Bedford-Stuyvesant, Brooklyn, NY",
+      "Harlem, Manhattan, NY",
+      "Chinatown, Manhattan, NY",
+      "Lower East Side, Manhattan, NY",
+      "Midtown Manhattan, NY",
+      "Upper East Side, Manhattan, NY",
+      "Upper West Side, Manhattan, NY",
+      "Financial District, Manhattan, NY"
+    ]
+  }
+];
+
 const OUTPUT_FIELDS = [
   "store_name",
   "address",
@@ -165,7 +203,7 @@ async function createJob(payload) {
     throw error;
   }
 
-  const cities = cleanLines(payload.cities);
+  const cities = expandCities(cleanLines(payload.cities));
   const keywords = cleanLines(payload.keywords);
   if (!cities.length || !keywords.length) {
     const error = new Error("城市和关键词不能为空。");
@@ -595,6 +633,26 @@ function cleanLines(value) {
     return value.map((item) => String(item).trim()).filter(Boolean);
   }
   return String(value || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
+
+function expandCities(cities) {
+  const expanded = [];
+  const seen = new Set();
+
+  for (const city of cities) {
+    const match = CITY_EXPANSIONS.find((entry) => entry.match.test(city.trim()));
+    const areas = match ? match.areas : [city];
+
+    for (const area of areas) {
+      const key = area.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        expanded.push(area);
+      }
+    }
+  }
+
+  return expanded;
 }
 
 function buildQueries(cities, keywords) {

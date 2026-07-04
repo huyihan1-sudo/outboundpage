@@ -73,9 +73,28 @@ For `maplead.eeconnect.co` deployment:
 
 ```text
 Type: A Record
-Host: mapleads
+Host: maplead
 Value: YOUR_SERVER_PUBLIC_IP
 TTL: Automatic
+```
+
+## GitHub + Render Public Web Deployment
+
+GitHub Pages cannot run this scraper because the app needs a Node.js backend and the
+`gosom/google-maps-scraper` binary. For a public web URL, connect this repository to a
+Docker-capable web host such as Render.
+
+This repo includes `render.yaml`, so the Render setup is:
+
+1. Push this repository to GitHub.
+2. In Render, create a new **Blueprint** from the GitHub repository.
+3. Render reads `render.yaml`, builds the Docker image, and exposes the app as a web service.
+4. Open the Render service URL, or add a custom domain such as `maplead.eeconnect.co`.
+
+The default app health endpoint is:
+
+```text
+/api/health
 ```
 
 ## 3. Start

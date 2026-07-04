@@ -18,6 +18,9 @@ const defaults = {
     "Metro by T-Mobile",
     "Cricket Wireless",
     "Boost Mobile",
+    "Ultra Mobile",
+    "Spectrum",
+    "Total Wireless",
     "Best Buy",
     "Walmart",
     "Target",
@@ -25,6 +28,44 @@ const defaults = {
     "Apple Store"
   ]
 };
+
+const cityExpansions = [
+  {
+    match: /^(new york|new york city|nyc|new york,\s*ny|nyc,\s*ny)$/i,
+    areas: [
+      "New York, NY",
+      "Manhattan, NY",
+      "Brooklyn, NY",
+      "Queens, NY",
+      "Bronx, NY",
+      "Staten Island, NY",
+      "Flushing, Queens, NY",
+      "Astoria, Queens, NY",
+      "Long Island City, Queens, NY",
+      "Jackson Heights, Queens, NY",
+      "Elmhurst, Queens, NY",
+      "Jamaica, Queens, NY",
+      "Forest Hills, Queens, NY",
+      "Bayside, Queens, NY",
+      "Sunnyside, Queens, NY",
+      "Williamsburg, Brooklyn, NY",
+      "Bushwick, Brooklyn, NY",
+      "Park Slope, Brooklyn, NY",
+      "Downtown Brooklyn, NY",
+      "Sunset Park, Brooklyn, NY",
+      "Bay Ridge, Brooklyn, NY",
+      "Crown Heights, Brooklyn, NY",
+      "Bedford-Stuyvesant, Brooklyn, NY",
+      "Harlem, Manhattan, NY",
+      "Chinatown, Manhattan, NY",
+      "Lower East Side, Manhattan, NY",
+      "Midtown Manhattan, NY",
+      "Upper East Side, Manhattan, NY",
+      "Upper West Side, Manhattan, NY",
+      "Financial District, Manhattan, NY"
+    ]
+  }
+];
 
 const state = {
   currentJobId: null,
@@ -88,13 +129,33 @@ function linesFrom(text) {
 }
 
 function buildQueries() {
-  const cities = linesFrom(els.citiesInput.value);
+  const cities = expandCities(linesFrom(els.citiesInput.value));
   const keywords = linesFrom(els.keywordsInput.value);
   return cities.flatMap((city) => keywords.map((keyword) => ({
     city,
     keyword,
     query: `${keyword} in ${city}`
   })));
+}
+
+function expandCities(cities) {
+  const expanded = [];
+  const seen = new Set();
+
+  for (const city of cities) {
+    const expansion = cityExpansions.find((entry) => entry.match.test(city.trim()));
+    const areas = expansion ? expansion.areas : [city];
+
+    for (const area of areas) {
+      const key = area.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        expanded.push(area);
+      }
+    }
+  }
+
+  return expanded;
 }
 
 function updateQueryPreview() {

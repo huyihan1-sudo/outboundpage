@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: eeconnect-maps-leads
+    env: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: GOSOM_BINARY
+        value: /app/tools/gosom/google-maps-scraper
