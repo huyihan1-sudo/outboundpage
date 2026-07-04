@@ -299,8 +299,21 @@ function runJob(job, options, health) {
     child.on("close", (code) => {
       appendLog(job, `Process exited with code ${code}`);
       if (code !== 0) {
-        job.status = "failed";
-        job.error = `gosom exited with code ${code}`;
+        if (fs.existsSync(job.rawPath)) {
+          try {
+            finalizeJob(job);
+            job.status = job.counts.clean > 0 ? "completed" : "failed";
+            job.error = job.counts.clean > 0 ? null : `gosom exited with code ${code}`;
+            appendLog(job, `Saved partial results after gosom exited with code ${code}`);
+          } catch (error) {
+            job.status = "failed";
+            job.error = `gosom exited with code ${code}`;
+            appendLog(job, `Could not save partial results: ${error.stack || error.message}`);
+          }
+        } else {
+          job.status = "failed";
+          job.error = `gosom exited with code ${code}`;
+        }
         touch(job);
         persistJob(job);
         return resolve();
