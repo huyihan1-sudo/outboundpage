@@ -1,55 +1,26 @@
-# EECONNECT Maps Leads
+# NomadsFi for Business marketing website
 
-Local Google Maps lead scraping dashboard powered by the open-source `gosom/google-maps-scraper` runner.
+An English B2B marketing site for NomadsFi, focused on global travel connectivity, portable connectivity and business-ready partnership routes.
 
-## Files
+## Pages
 
-- `index.html` - lead search dashboard
-- `styles.css` - dashboard styling and responsive layout
-- `script.js` - browser-side task creation, polling, logs, and exports
-- `server.js` - local API server that runs gosom jobs and normalizes results
-- `scripts/install-gosom.ps1` - downloads the latest Windows gosom binary
-- `scripts/start-server.ps1` - starts the local web server
-- `lead_scraper/` - Google Maps local business lead scraper and cleaning workflow
+- `/` - NomadsFi for Business overview
+- `/channel-partner` - NomadsFi Partner Network for retail, wireless stores and convenience stores
+- `/enterprise-connectivity` - global employee travel and portable business failover discussions
+- `/carrier-iot` - International IoT, ISP portable continuity and MVNO routes
 
-## Preview locally
-
-Install the gosom runner:
+## Run locally
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\install-gosom.ps1
+npm start
 ```
 
-Start the web tool:
+Open `http://localhost:3000`.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\start-server.ps1
-```
+The existing Node server serves the marketing routes as a lightweight client-rendered site while leaving the prior `/api/*` endpoints in place.
 
-Then open:
+## Contact capture
 
-```text
-http://localhost:3000
-```
+The **Talk to an Expert** drawer lazily loads the supplied Zoho Bigin embedded form. It contains no API credentials or client-side secrets and has a visible fallback if the remote form cannot be reached.
 
-The dashboard lets you enter cities and keywords, start a scraping job, monitor logs, preview results, and download CSV/JSON.
-
-Expose the local dashboard publicly with a temporary Cloudflare Quick Tunnel:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\start-public-tunnel.ps1
-```
-
-The generated `trycloudflare.com` URL stays alive while the tunnel process and local server are running.
-
-## Google Maps lead scraping
-
-The default search list covers Los Angeles, New York, and Boston with wireless store, phone repair, computer repair, computer store, and electronics repair keywords.
-
-Normalized fields:
-
-`store_name`, `address`, `phone`, `image_url`, `website`, `hours`, `rating`, `review_count`, `google_maps_url`, `latitude`, `longitude`, `category`, `city`, `source_keyword`, `place_id`, `cid`, `business_status`, `source_tool`, `scraped_at`
-
-## Sharing
-
-This project now includes a local Node server, so run it on a machine where the gosom binary or Docker is available.
+See [ZOHO_BIGIN_SETUP.md](ZOHO_BIGIN_SETUP.md) to configure required form fields, Bigin classifications, and the supported source-context behavior.

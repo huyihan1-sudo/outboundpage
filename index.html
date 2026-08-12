@@ -1,279 +1,57 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EECONNECT Maps Leads</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <span class="brand-mark">EE</span>
-        <div>
-          <p>Google Maps Leads</p>
-          <strong>EECONNECT</strong>
-        </div>
-      </div>
-
-      <nav class="nav-list" aria-label="主要模块">
-        <a href="#searchPanel" class="is-active">搜索任务</a>
-        <a href="#resultsPanel">结果列表</a>
-        <a href="#logsPanel">日志监控</a>
-        <a href="#setupPanel">运行环境</a>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="NomadsFi for Business brings global travel connectivity and portable connectivity expertise to teams and partners.">
+    <title>NomadsFi for Business — Stay connected, wherever work goes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/visuals.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="site-noise" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="NomadsFi home"><span class="brand-mark">N</span><span>NomadsFi</span></a>
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <a href="/#routes">Solutions</a>
+        <a href="/#how-it-works">How it works</a>
+        <a href="/#contact">Contact</a>
       </nav>
+      <button class="button button-small js-open-contact" type="button">Talk to an Expert <span aria-hidden="true">↗</span></button>
+    </header>
 
-      <div class="sidebar-status">
-        <span class="status-dot" id="runtimeDot"></span>
-        <div>
-          <p id="runtimeLabel">检测运行环境中</p>
-          <small id="runtimeDetail">gosom / Docker</small>
-        </div>
-      </div>
-    </aside>
+    <main id="main"></main>
 
-    <main class="workspace">
-      <header class="workspace-header">
-        <div>
-          <p class="eyebrow">Open-source runner: gosom/google-maps-scraper</p>
-          <h1>本地商家数据采集工具</h1>
-        </div>
-        <div class="header-actions">
-          <button class="secondary-btn" id="refreshHealthBtn" type="button">刷新环境</button>
-          <button class="primary-btn" id="startBtn" type="button">开始搜索</button>
-        </div>
-      </header>
+    <footer class="site-footer">
+      <a class="brand" href="/"><span class="brand-mark">N</span><span>NomadsFi</span></a>
+      <p>Connectivity for work on the move.</p>
+      <button class="text-link js-open-contact" type="button">Talk to an Expert <span aria-hidden="true">↗</span></button>
+      <small>© <span id="year"></span> NomadsFi. Built for business beyond borders.</small>
+    </footer>
 
-      <section class="metrics-grid" aria-label="任务指标">
-        <div class="metric">
-          <span>任务状态</span>
-          <strong id="jobStatus">未开始</strong>
+    <div class="contact-drawer" id="contact-drawer" aria-hidden="true">
+      <div class="drawer-backdrop js-close-contact"></div>
+      <section class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+        <button class="drawer-close js-close-contact" type="button" aria-label="Close contact form">×</button>
+        <p class="eyebrow">Start a conversation</p>
+        <h2 id="contact-title">Talk to an Expert.</h2>
+        <p class="drawer-intro">Tell us where portable or global connectivity needs to work harder. The NomadsFi team will follow up with a relevant next step.</p>
+        <div class="contact-context" aria-live="polite">
+          <span>Conversation context</span>
+          <strong id="contact-context">General NomadsFi for Business enquiry</strong>
         </div>
-        <div class="metric">
-          <span>有效门店</span>
-          <strong id="leadCount">0</strong>
+        <div id="bigin-form-region" class="bigin-form-region" aria-live="polite" aria-busy="true">
+          <p class="form-status">Loading secure contact form…</p>
         </div>
-        <div class="metric">
-          <span>查询组合</span>
-          <strong id="queryCount">24</strong>
-        </div>
-        <div class="metric">
-          <span>运行模式</span>
-          <strong id="runnerMode">待检测</strong>
-        </div>
+        <p class="form-note">Please use your work email. If the form does not load, try again later or use the contact method published by NomadsFi.</p>
       </section>
+    </div>
 
-      <section class="content-grid">
-        <form class="panel search-panel" id="searchPanel">
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">Step 1</p>
-              <h2>填写城市和关键词</h2>
-            </div>
-            <button class="text-btn" id="resetBtn" type="button">恢复默认</button>
-          </div>
-
-          <label class="field-block">
-            <span>城市，每行一个</span>
-            <textarea id="citiesInput" rows="5" spellcheck="false">Los Angeles, CA
-New York, NY
-Boston, MA</textarea>
-          </label>
-
-          <label class="field-block">
-            <span>关键词，每行一个</span>
-            <textarea id="keywordsInput" rows="8" spellcheck="false">wireless store
-cell phone store
-mobile phone repair
-phone repair
-iPhone repair
-computer repair
-computer store
-electronics repair</textarea>
-          </label>
-
-          <label class="field-block">
-            <span>排除词（反向词），每行一个 — 店名或类别含有这些词的结果将被过滤</span>
-            <textarea id="negativeKeywordsInput" rows="6" spellcheck="false">T-Mobile
-Verizon
-AT&T
-Sprint
-Metro by T-Mobile
-Cricket Wireless
-Boost Mobile
-Ultra Mobile
-Spectrum
-Total Wireless
-Best Buy
-Walmart
-Target
-Costco
-Apple Store</textarea>
-          </label>
-
-          <div class="options-grid">
-            <label class="field-block">
-              <span>抓取深度</span>
-              <input id="depthInput" type="number" min="1" max="20" value="1">
-            </label>
-            <label class="field-block">
-              <span>并发数</span>
-              <input id="concurrencyInput" type="number" min="1" max="16" value="2">
-            </label>
-            <label class="field-block">
-              <span>停滞退出</span>
-              <select id="inactivityInput">
-                <option value="3m">3 分钟</option>
-                <option value="5m">5 分钟</option>
-                <option value="10m">10 分钟</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="toggles">
-            <label><input id="fastModeInput" type="checkbox"> 快速模式</label>
-            <label><input id="emailInput" type="checkbox"> 抓取网站邮箱</label>
-            <label><input id="extraReviewsInput" type="checkbox"> 抓取更多评论</label>
-          </div>
-
-          <div class="options-grid">
-            <label class="field-block">
-              <span>快速模式中心点，可选</span>
-              <input id="geoInput" type="text" placeholder="42.3601,-71.0589">
-            </label>
-            <label class="field-block">
-              <span>半径，米</span>
-              <input id="radiusInput" type="number" min="100" max="50000" value="10000">
-            </label>
-            <label class="field-block">
-              <span>缩放级别</span>
-              <input id="zoomInput" type="number" min="1" max="21" value="15">
-            </label>
-          </div>
-
-          <label class="field-block">
-            <span>代理，可选，逗号分隔</span>
-            <input id="proxiesInput" type="text" placeholder="http://user:pass@host:port,socks5://host:port">
-          </label>
-
-          <div class="query-preview">
-            <div>
-              <strong>查询预览</strong>
-              <span id="queryPreviewHint">将生成 24 个 Google Maps 查询</span>
-            </div>
-            <ol id="queryPreview"></ol>
-          </div>
-        </form>
-
-        <section class="panel setup-panel" id="setupPanel">
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">Step 2</p>
-              <h2>运行环境</h2>
-            </div>
-          </div>
-
-          <div class="setup-list">
-            <div>
-              <span>gosom 二进制</span>
-              <strong id="binaryStatus">检测中</strong>
-              <small id="binaryPath"></small>
-            </div>
-            <div>
-              <span>Docker</span>
-              <strong id="dockerStatus">检测中</strong>
-              <small>未安装 Docker 时使用本地二进制</small>
-            </div>
-            <div>
-              <span>结果目录</span>
-              <strong>data/gosom/jobs</strong>
-              <small>每个任务单独保存 input、raw、clean、logs</small>
-            </div>
-          </div>
-
-          <div class="setup-actions">
-            <button class="secondary-btn" id="copyInstallBtn" type="button">复制安装命令</button>
-            <button class="secondary-btn" id="openRepoBtn" type="button">打开 GitHub</button>
-          </div>
-
-          <pre class="command-box" id="installCommand">powershell -ExecutionPolicy Bypass -File scripts\install-gosom.ps1</pre>
-        </section>
-      </section>
-
-      <section class="panel results-panel" id="resultsPanel">
-        <div class="panel-heading">
-          <div>
-            <p class="section-label">Step 3</p>
-            <h2>搜索结果</h2>
-          </div>
-          <div class="panel-actions">
-            <button class="secondary-btn" id="downloadCsvBtn" type="button" disabled>CSV</button>
-            <button class="secondary-btn" id="downloadJsonBtn" type="button" disabled>JSON</button>
-          </div>
-        </div>
-
-        <div class="results-toolbar">
-          <label>
-            <span>城市筛选</span>
-            <select id="cityFilter">
-              <option value="">全部城市</option>
-            </select>
-          </label>
-          <label>
-            <span>每页显示</span>
-            <select id="pageSizeSelect">
-              <option value="25">25 条</option>
-              <option value="50">50 条</option>
-              <option value="100">100 条</option>
-            </select>
-          </label>
-          <div class="pagination-summary" id="paginationSummary">暂无结果</div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>店铺名</th>
-                <th>地址</th>
-                <th>电话</th>
-                <th>城市</th>
-                <th>图片</th>
-                <th>地图</th>
-              </tr>
-            </thead>
-            <tbody id="resultsBody">
-              <tr>
-                <td colspan="6" class="empty-state">填写城市后点击开始搜索，结果会显示在这里。</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="pagination-bar">
-          <button class="secondary-btn" id="prevPageBtn" type="button" disabled>上一页</button>
-          <span id="pageInfo">第 0 / 0 页</span>
-          <button class="secondary-btn" id="nextPageBtn" type="button" disabled>下一页</button>
-        </div>
-      </section>
-
-      <section class="panel logs-panel" id="logsPanel">
-        <div class="panel-heading">
-          <div>
-            <p class="section-label">Step 4</p>
-            <h2>日志和监控</h2>
-          </div>
-          <span id="currentJobId">无任务</span>
-        </div>
-        <pre class="log-box" id="logBox">等待任务启动...</pre>
-      </section>
-    </main>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    <div class="mobile-cta"><button class="button js-open-contact" type="button">Talk to an Expert <span aria-hidden="true">↗</span></button></div>
+    <script src="/script.js" defer></script>
+  </body>
 </html>

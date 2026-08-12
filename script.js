@@ -1,481 +1,81 @@
-const defaults = {
-  cities: ["Los Angeles, CA", "New York, NY", "Boston, MA"],
-  keywords: [
-    "wireless store",
-    "cell phone store",
-    "mobile phone repair",
-    "phone repair",
-    "iPhone repair",
-    "computer repair",
-    "computer store",
-    "electronics repair"
-  ],
-  negativeKeywords: [
-    "T-Mobile",
-    "Verizon",
-    "AT&T",
-    "Sprint",
-    "Metro by T-Mobile",
-    "Cricket Wireless",
-    "Boost Mobile",
-    "Ultra Mobile",
-    "Spectrum",
-    "Total Wireless",
-    "Best Buy",
-    "Walmart",
-    "Target",
-    "Costco",
-    "Apple Store"
-  ]
+const PAGES = {
+  home: { context: "General NomadsFi for Business enquiry", template: `
+    <section class="hero"><div class="hero-copy"><p class="eyebrow">NomadsFi for Business</p><h1>Connectivity that <em>moves.</em></h1><p>NomadsFi brings global travel connectivity and portable connectivity expertise to teams, stores and operators that need to stay ready beyond the office.</p><div class="hero-actions"><button class="button js-open-contact" type="button">Talk to an Expert <span>-></span></button><a class="button button-quiet" href="/channel-partner">Explore the Partner Network</a></div></div><aside class="hero-data"><p>Global travel connectivity</p><strong>200+</strong><p>countries and territories referenced across NomadsFi travel connectivity</p></aside><div class="hero-orbit" aria-hidden="true"></div></section>
+    <div class="ticker"><span>Global travel connectivity  -  Business continuity  -  International IoT  -  Partner Network  -  Carrier enablement  -  Global travel connectivity  -  Business continuity  -  International IoT</span></div>
+    <section class="routes" id="routes"><div class="section-heading"><div><span class="section-kicker">01 / Find your route</span><h2>Built around how you move.</h2></div><p>Start where your connection need is sharpest. Every route leads to a focused conversation about product fit, rollout and support.</p></div><div class="route-list"><a class="route-card" href="/channel-partner"><span class="route-number">01</span><h3>Retail and local stores</h3><p>Wireless stores, retailers and convenience operators creating new portable-connectivity value at the counter.</p><span class="route-arrow">-></span></a><a class="route-card" href="/enterprise-connectivity"><span class="route-number">02</span><h3>Global employee travel</h3><p>An easier connectivity experience for teams on the move.</p><span class="route-arrow">-></span></a><a class="route-card" href="/enterprise-connectivity#failover"><span class="route-number">03</span><h3>Business failover</h3><p>Portable backup connectivity for locations that need an alternative path.</p><span class="route-arrow">-></span></a><a class="route-card" href="/carrier-iot#iot"><span class="route-number">04</span><h3>International IoT</h3><p>Multi-connection discussions for devices and fleets that cross borders.</p><span class="route-arrow">-></span></a><a class="route-card" href="/carrier-iot#carrier"><span class="route-number">05</span><h3>ISP and MVNO</h3><p>Coverage-led propositions for operators and their business customers.</p><span class="route-arrow">-></span></a></div></section>
+    ${capabilities([['01','Travel connectivity without the handoff maze','Give travelling teams a practical route to staying connected across markets.'],['02','Portable continuity options','Explore a backup connectivity path for critical work and temporary locations.'],['03','One commercial conversation','Bring related global connectivity needs into a clearer partner discussion.'],['04','Support shaped around rollout','Start with the markets, use cases and people that will make the connection work.']])}
+    ${caseSection('A distributed services team','Created a more consistent travel-connectivity approach for people moving between markets.',['Travel route review','Portable readiness','Partner support'])}
+    ${processSection()} ${faqSection([{q:'What does NomadsFi for Business support?',a:'NomadsFi for Business starts with portable and global travel connectivity needs, with relevant discussions for business continuity, channel partners and operators.'},{q:'Where can travel connectivity be used?',a:'NomadsFi references connectivity across more than 200 countries and territories. Speak with an expert to confirm what fits your travel routes.'},{q:'Can you support a multi-country conversation?',a:'Yes. Start with the locations, user needs and rollout considerations that matter to your organisation.'}])} ${contactSection('Make mobility more connected.')}` },
+  channel: { context: "NomadsFi Partner Network - Retail, wireless store or convenience store", template: `
+    ${pageHero('For retailers, wireless stores and convenience operators','Make portable connectivity <em>sellable.</em>','NomadsFi Partner Network helps your team introduce portable and travel connectivity that customers can understand and take with them.')}
+    <div class="audience-strip"><span>Designed for</span><strong>Retailer / Wireless Store / Convenience Store</strong></div>
+    ${benefits([['Product value','Travel ready offers','Portable connectivity with a clear customer purpose: travel, temporary work and staying ready away from home.'],['Commercial model','Visible economics','A multi-tier commission and rebate structure built for transparency and scale. Specific commercial terms are discussed directly with NomadsFi.'],['Partner support','Ready teams','Product guidance and partner support designed around the way your team sells.']])}
+    ${caseSection('An independent, multi-location retailer','Turned a high-intent travel question into a repeatable portable-connectivity category.',['Associate-ready playbook','Multi-tier earning path','Ongoing partner support'])}
+    <section id="how-it-works"><div class="section-heading"><div><span class="section-kicker">02 / How partnership starts</span><h2>A route that respects your floor.</h2></div><p>We shape the product story, enable your people and stay close to the outcome.</p></div>${processSection(true)}</section>
+    ${faqSection([{q:'How does the commission and rebate model work?',a:'NomadsFi uses a multi-tier commercial structure designed to be transparent and scalable. Terms, eligibility and rebate amounts are discussed directly for your business; no percentage assumptions are published.'},{q:'What types of stores can partner with NomadsFi?',a:'The Partner Network is intended for retailers, wireless stores and convenience operators where portable connectivity is relevant to customers.'},{q:'Will my team receive sales support?',a:'Partner enablement and product guidance are part of the launch conversation.'}])} ${contactSection('Build a stronger connectivity category.')}` },
+  enterprise: { context: "NomadsFi for Business - Global travel or portable business failover", template: `
+    ${pageHero('For enterprise travel and continuity leaders','One portable experience.<br><em>Wherever work goes.</em>','NomadsFi for Business supports global employee travel connectivity and portable business failover conversations for teams that work beyond a fixed location.')}
+    <div class="audience-strip"><span>For</span><strong>IT / Operations / People and Travel / Procurement</strong></div>
+    <section><div class="section-heading"><div><span class="section-kicker">01 / Connection for the work</span><h2>Travel ready. Continuity ready.</h2></div><p>Give employees a clearer way to connect when travelling, and explore a portable alternative for business locations that need a backup path.</p></div><div class="benefit-grid"><article class="benefit"><span class="section-kicker">Global travel</span><h3>200+ countries</h3><p>Review portable connectivity options for employees travelling across borders.</p></article><article class="benefit" id="failover"><span class="section-kicker">Business failover</span><h3>Stay ready</h3><p>Consider a portable backup option around important locations and temporary operations.</p></article><article class="benefit"><span class="section-kicker">Management</span><h3>One conversation</h3><p>Bring travel and portable continuity needs into a focused commercial discussion.</p></article></div></section>
+    ${capabilities([['IT','Control without the sprawl','Start with the users, locations and device-management expectations you need to account for.'],['OPS','Protect the handoffs','Reduce uncertainty for mobile teams and important sites when the usual connection is unavailable.'],['PEOPLE','Look after travellers','Give employees a more practical connectivity option when they cross a border.'],['PROC','Make the choice accountable','Match coverage, commercial clarity and rollout support to the decision in front of you.']])}
+    ${caseSection('A distributed professional services team','Created a more consistent portable connectivity plan for travellers and priority locations.',['Coverage review','Deployment discussion','One partner conversation'])}
+    ${faqSection([{q:'Can NomadsFi support travel and business failover discussions?',a:'Yes. The first conversation can cover global employee travel connectivity and portable backup needs for locations that matter.'},{q:'How quickly can a deployment start?',a:'The appropriate path depends on the location, scale and solution. An expert can help map practical next steps.'},{q:'Which countries are covered?',a:'NomadsFi references connectivity across more than 200 countries and territories. Please confirm exact coverage for your routes with the team.'}])} ${contactSection('Give work a more dependable connection.')}` },
+  carrier: { context: "NomadsFi for Business - International IoT, ISP or MVNO", template: `
+    ${pageHero('For carrier, ISP, MVNO and IoT leaders','Make the connectivity opportunity <em>move.</em>','Three distinct buying routes for operators and connected-device businesses exploring international reach, portable continuity or a sharper customer proposition.')}
+    <div class="audience-strip"><span>Built for</span><strong>International IoT / ISP portable continuity / MVNO propositions</strong></div>
+    <section class="module-tabs"><div class="section-heading"><div><span class="section-kicker">01 / Choose the operating logic</span><h2>Same ambition. Different route.</h2></div><p>Select your focus to see the buying logic and conversation that fits it best.</p></div><div class="tabs" role="tablist" aria-label="NomadsFi carrier and IoT solutions"><button class="tab" role="tab" aria-selected="true" aria-controls="iot-panel" id="iot-tab" data-tab="iot">International IoT</button><button class="tab" role="tab" aria-selected="false" aria-controls="isp-panel" id="isp-tab" data-tab="isp">ISP and failover</button><button class="tab" role="tab" aria-selected="false" aria-controls="mvno-panel" id="mvno-tab" data-tab="mvno">MVNO</button></div><article class="module-panel active" role="tabpanel" id="iot-panel" aria-labelledby="iot-tab" data-panel="iot"><div><span class="section-kicker">International IoT / Multi-Connection</span><h3>Devices should not notice borders.</h3></div><div><p>Explore a multi-connection strategy for devices, assets and fleets that need to operate across markets.</p><ul><li>International footprint for connected deployments</li><li>Multi-connection discussion for device estates</li><li>Commercial and rollout conversation around scale</li></ul><button class="text-link js-open-contact" type="button" data-solution="International IoT / Multi-Connection">Discuss international IoT -&gt;</button></div></article><article class="module-panel" role="tabpanel" id="isp-panel" aria-labelledby="isp-tab" data-panel="isp"><div><span class="section-kicker">ISP / Pre-installed coverage and portable failover</span><h3>Make readiness part of the service.</h3></div><div><p>Explore a portable continuity proposition for business customers that need an alternative connection path.</p><ul><li>Portable backup aligned to your service model</li><li>Coverage and readiness discussion</li><li>Customer proposition and rollout support</li></ul><button class="text-link js-open-contact" type="button" data-solution="ISP portable coverage / Business failover">Discuss ISP failover -&gt;</button></div></article><article class="module-panel" role="tabpanel" id="mvno-panel" aria-labelledby="mvno-tab" data-panel="mvno"><div><span class="section-kicker">MVNO</span><h3>Build a more mobile proposition.</h3></div><div><p>Explore the connectivity and commercial ingredients that can help an MVNO create a more relevant offer for customers on the move.</p><ul><li>International connectivity proposition</li><li>Clear commercial route for operator discussions</li><li>Flexibility for audience-specific offers</li></ul><button class="text-link js-open-contact" type="button" data-solution="MVNO">Discuss an MVNO proposition -&gt;</button></div></article></section>
+    ${caseSection('A growing connectivity operator','Mapped a mobile proposition around coverage, readiness and the commercial detail its customers needed.',['Defined buying route','Market-ready narrative','Launch support'])}
+    ${faqSection([{q:'Which module is right for us?',a:'Use International IoT for connected devices and fleets, ISP and failover for portable continuity propositions, and MVNO for a customer-facing connectivity offer.'},{q:'Can one business discuss more than one route?',a:'Yes. Many operators have adjacent needs. The first conversation clarifies priorities before a commercial or technical plan is shaped.'},{q:'Do you support deployment discussions?',a:'NomadsFi can discuss deployment support appropriate to the solution, market and rollout scope.'}])} ${contactSection('Turn mobility into a sharper proposition.')}` }
 };
 
-const cityExpansions = [
-  {
-    match: /^(new york|new york city|nyc|new york,\s*ny|nyc,\s*ny)$/i,
-    areas: [
-      "New York, NY",
-      "Manhattan, NY",
-      "Brooklyn, NY",
-      "Queens, NY",
-      "Bronx, NY",
-      "Staten Island, NY",
-      "Flushing, Queens, NY",
-      "Astoria, Queens, NY",
-      "Long Island City, Queens, NY",
-      "Jackson Heights, Queens, NY",
-      "Elmhurst, Queens, NY",
-      "Jamaica, Queens, NY",
-      "Forest Hills, Queens, NY",
-      "Bayside, Queens, NY",
-      "Sunnyside, Queens, NY",
-      "Williamsburg, Brooklyn, NY",
-      "Bushwick, Brooklyn, NY",
-      "Park Slope, Brooklyn, NY",
-      "Downtown Brooklyn, NY",
-      "Sunset Park, Brooklyn, NY",
-      "Bay Ridge, Brooklyn, NY",
-      "Crown Heights, Brooklyn, NY",
-      "Bedford-Stuyvesant, Brooklyn, NY",
-      "Harlem, Manhattan, NY",
-      "Chinatown, Manhattan, NY",
-      "Lower East Side, Manhattan, NY",
-      "Midtown Manhattan, NY",
-      "Upper East Side, Manhattan, NY",
-      "Upper West Side, Manhattan, NY",
-      "Financial District, Manhattan, NY"
-    ]
-  }
-];
+function pageHero(kicker, title, text) { return `<section class="page-hero"><p class="eyebrow">${kicker}</p><h1>${title}</h1><p>${text}</p><button class="button js-open-contact" type="button">Talk to an Expert <span>-></span></button></section>`; }
+function benefits(items) { return `<section><div class="section-heading"><div><span class="section-kicker">01 / A better route</span><h2>Simple to explain. Clear to own.</h2></div><p>Start with a customer need, then shape a NomadsFi offer that makes sense for your business.</p></div><div class="benefit-grid">${items.map(x=>`<article class="benefit"><span class="section-kicker">${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('')}</div></section>`; }
+function capabilities(items) { return `<section class="capabilities"><div><span class="section-kicker">02 / What changes</span><h2>Less connection complexity. More readiness.</h2></div><div class="cap-list">${items.map(x=>`<article class="cap-item"><span>${x[0]}</span><div><h3>${x[1]}</h3><p>${x[2]}</p></div></article>`).join('')}</div></section>`; }
+function caseSection(label, quote, stats) { return `<section class="case-grid"><div><span class="section-kicker">03 / A possible outcome</span><h2>From moving parts to forward motion.</h2><div class="case-stats">${stats.map((s,i)=>`<div><strong>0${i+1}</strong><span>${s}</span></div>`).join('')}</div></div><blockquote class="case-quote">"${quote}"<cite>Illustrative client scenario / details protected</cite></blockquote></section>`; }
+function processSection(inner=false) { const content=`<div class="process-grid"><article class="process-item"><span>01</span><h3>Listen</h3><p>Start with the markets, teams, locations or customers that matter most.</p></article><article class="process-item"><span>02</span><h3>Shape</h3><p>Match the portable and global connectivity route to your operating reality.</p></article><article class="process-item"><span>03</span><h3>Launch</h3><p>Move through a practical rollout conversation with people who stay accountable.</p></article><article class="process-item"><span>04</span><h3>Grow</h3><p>Keep refining the connection as your organisation and opportunity move.</p></article></div>`; return inner ? content : `<section id="how-it-works"><div class="section-heading"><div><span class="section-kicker">04 / The NomadsFi way</span><h2>A partner for work in motion.</h2></div><p>We help make portable and travel connectivity work in the real world.</p></div>${content}</section>`; }
+function faqSection(items) { return `<section class="faq"><div class="section-heading"><div><span class="section-kicker">Questions, answered</span><h2>Useful before we talk.</h2></div></div><div class="faq-list">${items.map(x=>`<details class="faq-item"><summary>${x.q}</summary><p>${x.a}</p></details>`).join('')}</div></section>`; }
+function contactSection(title) { return `<section class="contact-cta" id="contact"><span class="section-kicker">A conversation can start here</span><h2>${title}</h2><p>Tell us what needs to connect, where it needs to work and what a better outcome looks like.</p><button class="button js-open-contact" type="button">Talk to an Expert <span>-></span></button></section>`; }
 
-const state = {
-  currentJobId: null,
-  pollTimer: null,
-  results: [],
-  filteredResults: [],
-  page: 1,
-  pageSize: 25
-};
+const path = window.location.pathname.replace(/\/$/, '') || '/';
+const pageKey = path === '/channel-partner' ? 'channel' : path === '/enterprise-connectivity' ? 'enterprise' : path === '/carrier-iot' ? 'carrier' : 'home';
+const page = PAGES[pageKey];
+document.title = pageKey === 'home' ? 'NomadsFi for Business - Stay connected, wherever work goes' : `${pageKey === 'channel' ? 'NomadsFi Partner Network' : pageKey === 'enterprise' ? 'NomadsFi for Business' : 'NomadsFi Carrier and IoT'} - NomadsFi`;
+document.querySelector('#main').innerHTML = page.template;
+addPageVisuals(pageKey);
+document.querySelector('#year').textContent = new Date().getFullYear();
 
-const els = {
-  citiesInput: document.getElementById("citiesInput"),
-  keywordsInput: document.getElementById("keywordsInput"),
-  depthInput: document.getElementById("depthInput"),
-  concurrencyInput: document.getElementById("concurrencyInput"),
-  inactivityInput: document.getElementById("inactivityInput"),
-  fastModeInput: document.getElementById("fastModeInput"),
-  emailInput: document.getElementById("emailInput"),
-  extraReviewsInput: document.getElementById("extraReviewsInput"),
-  geoInput: document.getElementById("geoInput"),
-  radiusInput: document.getElementById("radiusInput"),
-  zoomInput: document.getElementById("zoomInput"),
-  negativeKeywordsInput: document.getElementById("negativeKeywordsInput"),
-  proxiesInput: document.getElementById("proxiesInput"),
-  startBtn: document.getElementById("startBtn"),
-  resetBtn: document.getElementById("resetBtn"),
-  refreshHealthBtn: document.getElementById("refreshHealthBtn"),
-  copyInstallBtn: document.getElementById("copyInstallBtn"),
-  openRepoBtn: document.getElementById("openRepoBtn"),
-  queryCount: document.getElementById("queryCount"),
-  queryPreview: document.getElementById("queryPreview"),
-  queryPreviewHint: document.getElementById("queryPreviewHint"),
-  runtimeDot: document.getElementById("runtimeDot"),
-  runtimeLabel: document.getElementById("runtimeLabel"),
-  runtimeDetail: document.getElementById("runtimeDetail"),
-  runnerMode: document.getElementById("runnerMode"),
-  binaryStatus: document.getElementById("binaryStatus"),
-  binaryPath: document.getElementById("binaryPath"),
-  dockerStatus: document.getElementById("dockerStatus"),
-  jobStatus: document.getElementById("jobStatus"),
-  leadCount: document.getElementById("leadCount"),
-  currentJobId: document.getElementById("currentJobId"),
-  logBox: document.getElementById("logBox"),
-  resultsBody: document.getElementById("resultsBody"),
-  cityFilter: document.getElementById("cityFilter"),
-  pageSizeSelect: document.getElementById("pageSizeSelect"),
-  paginationSummary: document.getElementById("paginationSummary"),
-  prevPageBtn: document.getElementById("prevPageBtn"),
-  nextPageBtn: document.getElementById("nextPageBtn"),
-  pageInfo: document.getElementById("pageInfo"),
-  downloadCsvBtn: document.getElementById("downloadCsvBtn"),
-  downloadJsonBtn: document.getElementById("downloadJsonBtn"),
-  installCommand: document.getElementById("installCommand")
-};
-
-function linesFrom(text) {
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function buildQueries() {
-  const cities = expandCities(linesFrom(els.citiesInput.value));
-  const keywords = linesFrom(els.keywordsInput.value);
-  return cities.flatMap((city) => keywords.map((keyword) => ({
-    city,
-    keyword,
-    query: `${keyword} in ${city}`
-  })));
-}
-
-function expandCities(cities) {
-  const expanded = [];
-  const seen = new Set();
-
-  for (const city of cities) {
-    const expansion = cityExpansions.find((entry) => entry.match.test(city.trim()));
-    const areas = expansion ? expansion.areas : [city];
-
-    for (const area of areas) {
-      const key = area.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        expanded.push(area);
-      }
-    }
-  }
-
-  return expanded;
-}
-
-function updateQueryPreview() {
-  const queries = buildQueries();
-  els.queryCount.textContent = String(queries.length);
-  els.queryPreviewHint.textContent = `将生成 ${queries.length} 个 Google Maps 查询`;
-  els.queryPreview.innerHTML = queries
-    .slice(0, 30)
-    .map((item) => `<li>${escapeHtml(item.query)}</li>`)
-    .join("");
-  if (queries.length > 30) {
-    const li = document.createElement("li");
-    li.textContent = `还有 ${queries.length - 30} 个查询`;
-    els.queryPreview.appendChild(li);
-  }
-}
-
-async function fetchJson(url, options = {}) {
-  const response = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
-    ...options
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.error || `Request failed: ${response.status}`);
-  }
-  return payload;
-}
-
-async function refreshHealth() {
-  try {
-    const health = await fetchJson("/api/health");
-    els.runnerMode.textContent = health.runnerMode || "未就绪";
-    els.binaryStatus.textContent = health.binary.available ? "可用" : "未安装";
-    els.binaryPath.textContent = health.binary.path || "tools/gosom/google-maps-scraper.exe";
-    els.dockerStatus.textContent = health.docker.available ? "可用" : "未安装";
-    els.runtimeDot.className = `status-dot ${health.ready ? "is-ok" : "is-bad"}`;
-    els.runtimeLabel.textContent = health.ready ? "运行环境可用" : "需要安装运行器";
-    els.runtimeDetail.textContent = health.ready
-      ? `${health.runnerMode} 已就绪`
-      : "请先运行安装命令或安装 Docker";
-    els.startBtn.disabled = !health.ready;
-    loadLatestJob();
-  } catch (error) {
-    els.runtimeDot.className = "status-dot is-bad";
-    els.runtimeLabel.textContent = "环境检测失败";
-    els.runtimeDetail.textContent = error.message;
-    els.startBtn.disabled = true;
-  }
-}
-
-async function loadLatestJob() {
-  if (state.currentJobId) return;
-  try {
-    const latest = await fetchJson("/api/jobs/latest");
-    if (!latest || latest.job === null || !latest.id) return;
-    state.currentJobId = latest.id;
-    renderJob(latest);
-  } catch {
-    // The latest job endpoint is a convenience only.
-  }
-}
-
-async function startJob() {
-  const cities = linesFrom(els.citiesInput.value);
-  const keywords = linesFrom(els.keywordsInput.value);
-
-  if (!cities.length || !keywords.length) {
-    setLog("城市和关键词都不能为空。");
+function addPageVisuals(key) {
+  const makeImage = (src, alt, hero = false) => {
+    const image = document.createElement('img');
+    image.src = src;
+    image.alt = alt;
+    image.width = 1536;
+    image.height = 1024;
+    image.decoding = 'async';
+    if (hero) image.className = 'hero-image';
+    else image.loading = 'lazy';
+    return image;
+  };
+  if (key === 'home') {
+    document.querySelector('.hero')?.prepend(makeImage('/assets/images/nomadsfi-global-travel-hero.png', 'Airport windows overlooking aircraft at blue hour, with an unbranded travel bag and portable connectivity device on a table', true));
     return;
   }
-
-  els.startBtn.disabled = true;
-  setStatus("启动中");
-  setLog("正在创建采集任务...");
-  clearResults();
-
-  try {
-    const payload = await fetchJson("/api/search", {
-      method: "POST",
-      body: JSON.stringify({
-        cities,
-        keywords,
-        depth: Number(els.depthInput.value || 1),
-        concurrency: Number(els.concurrencyInput.value || 2),
-        exitOnInactivity: els.inactivityInput.value,
-        fastMode: els.fastModeInput.checked,
-        geo: els.geoInput.value.trim(),
-        radius: Number(els.radiusInput.value || 10000),
-        zoom: Number(els.zoomInput.value || 15),
-        email: els.emailInput.checked,
-        extraReviews: els.extraReviewsInput.checked,
-        negativeKeywords: linesFrom(els.negativeKeywordsInput.value),
-        proxies: els.proxiesInput.value.trim()
-      })
-    });
-
-    state.currentJobId = payload.jobId;
-    els.currentJobId.textContent = payload.jobId;
-    setStatus("运行中");
-    startPolling();
-  } catch (error) {
-    setStatus("启动失败");
-    setLog(error.message);
-    els.startBtn.disabled = false;
-  }
+  const visual = document.createElement('section');
+  visual.className = `supporting-visual${key === 'carrier' ? ' supporting-visual-dark' : ''}`;
+  const asset = key === 'channel' ? '/assets/images/nomadsfi-partner-retail.png' : '/assets/images/nomadsfi-enterprise-iot.png';
+  const alt = key === 'channel' ? 'Retail associate arranging an unbranded portable connectivity device and travel pouch at a modern store counter' : 'Anonymous traveller reviewing global connection routes beside unbranded portable connectivity devices';
+  const title = key === 'channel' ? 'A partner offer your team can see.' : key === 'enterprise' ? 'A clearer view of work in motion.' : 'Map the opportunity across markets.';
+  visual.innerHTML = `<div class="supporting-visual-copy"><span class="section-kicker">A closer look</span><h2>${title}</h2><p>Portable connectivity belongs in the moments where mobility, readiness and customer confidence meet.</p></div>`;
+  visual.appendChild(makeImage(asset, alt));
+  const anchor = key === 'carrier' ? document.querySelector('.module-tabs') : document.querySelector('.audience-strip');
+  anchor?.insertAdjacentElement('afterend', visual);
 }
 
-function startPolling() {
-  if (state.pollTimer) {
-    clearInterval(state.pollTimer);
-  }
-  pollJob();
-  state.pollTimer = setInterval(pollJob, 2500);
-}
-
-async function pollJob() {
-  if (!state.currentJobId) return;
-
-  try {
-    const job = await fetchJson(`/api/jobs/${encodeURIComponent(state.currentJobId)}`);
-    renderJob(job);
-    if (["completed", "failed"].includes(job.status)) {
-      clearInterval(state.pollTimer);
-      state.pollTimer = null;
-      els.startBtn.disabled = false;
-    }
-  } catch (error) {
-    setLog(error.message);
-  }
-}
-
-function renderJob(job) {
-  const label = {
-    queued: "排队中",
-    running: "运行中",
-    completed: "已完成",
-    failed: "失败"
-  }[job.status] || job.status;
-
-  setStatus(label);
-  els.currentJobId.textContent = job.id;
-  els.leadCount.textContent = String(job.counts?.clean || 0);
-  els.logBox.textContent = job.logs || "等待日志...";
-
-  if (job.results?.length) {
-    setResults(job.results);
-  } else if (job.preview?.length) {
-    setResults(job.preview);
-  }
-
-  const downloadable = job.status === "completed" && (job.counts?.clean || 0) > 0;
-  els.downloadCsvBtn.disabled = !downloadable;
-  els.downloadJsonBtn.disabled = !downloadable;
-}
-
-function setResults(rows) {
-  const previousCity = els.cityFilter.value;
-  state.results = rows || [];
-  state.page = 1;
-  updateCityFilter(previousCity);
-  applyFilters();
-}
-
-function updateCityFilter(selectedValue = "") {
-  const cities = Array.from(new Set(state.results.map((row) => row.city).filter(Boolean))).sort();
-  els.cityFilter.innerHTML = '<option value="">全部城市</option>' + cities
-    .map((city) => `<option value="${escapeAttr(city)}">${escapeHtml(city)}</option>`)
-    .join("");
-
-  if (cities.includes(selectedValue)) {
-    els.cityFilter.value = selectedValue;
-  }
-}
-
-function applyFilters() {
-  const city = els.cityFilter.value;
-  state.pageSize = Number(els.pageSizeSelect.value || 25);
-  state.filteredResults = city
-    ? state.results.filter((row) => row.city === city)
-    : [...state.results];
-  state.page = Math.min(state.page, totalPages());
-  if (state.page < 1) state.page = 1;
-  renderCurrentPage();
-}
-
-function totalPages() {
-  return Math.max(1, Math.ceil(state.filteredResults.length / state.pageSize));
-}
-
-function renderCurrentPage() {
-  const total = state.filteredResults.length;
-  const pages = totalPages();
-  const start = total ? (state.page - 1) * state.pageSize : 0;
-  const end = Math.min(start + state.pageSize, total);
-  const rows = state.filteredResults.slice(start, end);
-
-  els.paginationSummary.textContent = total
-    ? `显示 ${start + 1}-${end} / ${total} 条`
-    : "暂无结果";
-  els.pageInfo.textContent = total ? `第 ${state.page} / ${pages} 页` : "第 0 / 0 页";
-  els.prevPageBtn.disabled = !total || state.page <= 1;
-  els.nextPageBtn.disabled = !total || state.page >= pages;
-
-  if (!rows.length) {
-    els.resultsBody.innerHTML = '<tr><td colspan="6" class="empty-state">没有符合筛选条件的结果。</td></tr>';
-    return;
-  }
-
-  els.resultsBody.innerHTML = rows.map((row) => `
-    <tr>
-      <td>${escapeHtml(row.store_name)}</td>
-      <td>${escapeHtml(row.address)}</td>
-      <td>${escapeHtml(row.phone)}</td>
-      <td>${escapeHtml(row.city)}</td>
-      <td>${row.image_url ? `<a href="${escapeAttr(row.image_url)}" target="_blank" rel="noreferrer">查看</a>` : ""}</td>
-      <td>${row.google_maps_url ? `<a href="${escapeAttr(row.google_maps_url)}" target="_blank" rel="noreferrer">打开</a>` : ""}</td>
-    </tr>
-  `).join("");
-}
-
-function clearResults() {
-  els.leadCount.textContent = "0";
-  state.results = [];
-  state.filteredResults = [];
-  state.page = 1;
-  updateCityFilter();
-  els.paginationSummary.textContent = "暂无结果";
-  els.pageInfo.textContent = "第 0 / 0 页";
-  els.prevPageBtn.disabled = true;
-  els.nextPageBtn.disabled = true;
-  els.downloadCsvBtn.disabled = true;
-  els.downloadJsonBtn.disabled = true;
-  els.resultsBody.innerHTML = '<tr><td colspan="6" class="empty-state">任务运行中，结果会自动刷新。</td></tr>';
-}
-
-function setStatus(value) {
-  els.jobStatus.textContent = value;
-}
-
-function setLog(value) {
-  els.logBox.textContent = value;
-}
-
-function download(format) {
-  if (!state.currentJobId) return;
-  window.location.href = `/api/jobs/${encodeURIComponent(state.currentJobId)}/download?format=${format}`;
-}
-
-function resetDefaults() {
-  els.citiesInput.value = defaults.cities.join("\n");
-  els.keywordsInput.value = defaults.keywords.join("\n");
-  els.negativeKeywordsInput.value = defaults.negativeKeywords.join("\n");
-  els.depthInput.value = "1";
-  els.concurrencyInput.value = "2";
-  els.inactivityInput.value = "3m";
-  els.fastModeInput.checked = false;
-  els.geoInput.value = "";
-  els.radiusInput.value = "10000";
-  els.zoomInput.value = "15";
-  els.emailInput.checked = false;
-  els.extraReviewsInput.checked = false;
-  els.proxiesInput.value = "";
-  updateQueryPreview();
-}
-
-async function copyInstallCommand() {
-  try {
-    await navigator.clipboard.writeText(els.installCommand.textContent.trim());
-    els.copyInstallBtn.textContent = "已复制";
-    setTimeout(() => {
-      els.copyInstallBtn.textContent = "复制安装命令";
-    }, 1600);
-  } catch {
-    setLog("复制失败，请手动复制安装命令。");
-  }
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value).replace(/`/g, "&#096;");
-}
-
-[els.citiesInput, els.keywordsInput].forEach((input) => {
-  input.addEventListener("input", updateQueryPreview);
-});
-
-els.startBtn.addEventListener("click", startJob);
-els.resetBtn.addEventListener("click", resetDefaults);
-els.refreshHealthBtn.addEventListener("click", refreshHealth);
-els.copyInstallBtn.addEventListener("click", copyInstallCommand);
-els.openRepoBtn.addEventListener("click", () => {
-  window.open("https://github.com/gosom/google-maps-scraper", "_blank", "noreferrer");
-});
-els.downloadCsvBtn.addEventListener("click", () => download("csv"));
-els.downloadJsonBtn.addEventListener("click", () => download("json"));
-els.cityFilter.addEventListener("change", () => {
-  state.page = 1;
-  applyFilters();
-});
-els.pageSizeSelect.addEventListener("change", () => {
-  state.page = 1;
-  applyFilters();
-});
-els.prevPageBtn.addEventListener("click", () => {
-  state.page = Math.max(1, state.page - 1);
-  renderCurrentPage();
-});
-els.nextPageBtn.addEventListener("click", () => {
-  state.page = Math.min(totalPages(), state.page + 1);
-  renderCurrentPage();
-});
-
-updateQueryPreview();
-refreshHealth();
+const drawer = document.querySelector('#contact-drawer'); const region = document.querySelector('#bigin-form-region'); const context = document.querySelector('#contact-context'); let biginStarted=false; let lastFocused;
+function openContact(event) { lastFocused=event?.currentTarget||document.activeElement; const solution=event?.currentTarget?.dataset.solution; context.textContent=solution ? `${page.context} - ${solution}` : page.context; drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; drawer.querySelector('.drawer-close').focus(); loadBigin(); }
+function closeContact() { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); document.body.style.overflow=''; lastFocused?.focus(); }
+document.querySelectorAll('.js-open-contact').forEach(btn=>btn.addEventListener('click',openContact)); document.querySelectorAll('.js-close-contact').forEach(btn=>btn.addEventListener('click',closeContact)); document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drawer.classList.contains('open'))closeContact();});
+function loadBigin() { if(biginStarted)return; biginStarted=true; const script=document.createElement('script'); script.id='formScript7309635000000670253'; script.src='https://us.bigin.online/org917690855/forms/giftexpo?script=$sYG'; script.async=true; script.onload=()=>{region.setAttribute('aria-busy','false');const status=region.querySelector('.form-status');if(status)status.textContent='Secure contact form is ready below.';}; script.onerror=formFailure; document.body.appendChild(script); window.setTimeout(()=>{if(!region.querySelector('iframe, form, input, select, textarea')){const status=region.querySelector('.form-status');if(status&&status.textContent.includes('Loading'))formFailure();}},9000); }
+function formFailure(){region.setAttribute('aria-busy','false');region.innerHTML='<p class="form-status error">The secure contact form could not load. Please try again later or use the contact method published by NomadsFi.</p>';}
+document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{const target=tab.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===tab)));document.querySelectorAll('.module-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===target));history.replaceState(null,'',`#${target==='iot'?'iot':target==='isp'?'isp-failover':'carrier'}`);}));
+if(pageKey==='carrier'&&location.hash){const key=location.hash==='#iot'?'iot':location.hash==='#isp'||location.hash==='#isp-failover'?'isp':location.hash==='#mvno'?'mvno':null;if(key)document.querySelector(`.tab[data-tab="${key}"]`)?.click();}
