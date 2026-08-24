@@ -7,7 +7,7 @@ WORKDIR /app
 ENV HOME=/app
 ENV XDG_CACHE_HOME=/app/.cache
 ENV PLAYWRIGHT_BROWSERS_PATH=/app/.cache/ms-playwright
-ENV PLAYWRIGHT_DRIVER_PATH=/app/.cache
+ENV PLAYWRIGHT_DRIVER_PATH=/app/.cache/ms-playwright-go
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \

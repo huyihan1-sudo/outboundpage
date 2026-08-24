@@ -11,7 +11,7 @@ const DATA_DIR = path.join(ROOT, "data", "gosom");
 const JOBS_DIR = path.join(DATA_DIR, "jobs");
 const TOOLS_DIR = path.join(ROOT, "tools", "gosom");
 const MAX_BODY_BYTES = 1024 * 1024;
-const PUBLIC_FILES = new Set(["/index.html", "/styles.css", "/visuals.css", "/script.js", "/favicon.ico", "/assets/images/nomadsfi-global-travel-hero.png", "/assets/images/nomadsfi-partner-retail.png", "/assets/images/nomadsfi-enterprise-iot.png"]);
+const PUBLIC_FILES = new Set(["/index.html", "/styles.css", "/script.js", "/favicon.ico"]);
 
 const CITY_EXPANSIONS = [
   {
@@ -873,8 +873,7 @@ function sendDownload(res, job, format) {
 
 function serveStatic(req, res) {
   const url = new URL(req.url, `http://localhost:${PORT}`);
-  const marketingRoutes = new Set(["/", "/channel-partner", "/enterprise-connectivity", "/carrier-iot"]);
-  const pathname = marketingRoutes.has(url.pathname) ? "/index.html" : url.pathname;
+  const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
   if (!PUBLIC_FILES.has(pathname)) {
     res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
     res.end("Not found");
@@ -893,7 +892,6 @@ function serveStatic(req, res) {
     ".html": "text/html; charset=utf-8",
     ".css": "text/css; charset=utf-8",
     ".js": "application/javascript; charset=utf-8",
-    ".png": "image/png",
     ".json": "application/json; charset=utf-8"
   }[ext] || "application/octet-stream";
 
