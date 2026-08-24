@@ -9,6 +9,8 @@ const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
 const DATA_DIR = path.join(ROOT, "data", "gosom");
 const JOBS_DIR = path.join(DATA_DIR, "jobs");
+const PLAYWRIGHT_DRIVER_DIR = path.join(ROOT, "data", "playwright-driver");
+const PLAYWRIGHT_BROWSERS_DIR = path.join(ROOT, "data", "ms-playwright");
 const TOOLS_DIR = path.join(ROOT, "tools", "gosom");
 const MAX_BODY_BYTES = 1024 * 1024;
 const PUBLIC_FILES = new Set(["/index.html", "/styles.css", "/script.js", "/favicon.ico"]);
@@ -281,7 +283,13 @@ function runJob(job, options, health) {
     const child = spawn(command, args, {
       cwd: ROOT,
       windowsHide: true,
-      env: { ...process.env, DISABLE_TELEMETRY: process.env.DISABLE_TELEMETRY || "1" }
+      env: {
+        ...process.env,
+        DISABLE_TELEMETRY: process.env.DISABLE_TELEMETRY || "1",
+        PLAYWRIGHT_DRIVER_PATH: process.env.PLAYWRIGHT_DRIVER_PATH || PLAYWRIGHT_DRIVER_DIR,
+        PLAYWRIGHT_BROWSERS_PATH: process.env.PLAYWRIGHT_BROWSERS_PATH || PLAYWRIGHT_BROWSERS_DIR,
+        PLAYWRIGHT_DOWNLOAD_HOST: process.env.PLAYWRIGHT_DOWNLOAD_HOST || "https://npmmirror.com/mirrors/playwright"
+      }
     });
 
     child.stdout.on("data", (chunk) => appendLog(job, chunk.toString()));
